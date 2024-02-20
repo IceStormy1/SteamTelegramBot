@@ -1,33 +1,30 @@
 using Microsoft.AspNetCore.Mvc;
+using SteamTelegramBot.Clients;
+using SteamTelegramBot.Clients.Models;
 
-namespace SteamTelegramBot.Controllers
+namespace SteamTelegramBot.Controllers;
+
+[ApiController]
+[Route("[controller]")]
+public class BotController : ControllerBase
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class BotController : ControllerBase
+    private readonly ILogger<BotController> _logger;
+    private readonly IStoreSteamApiClient _storeSteamApiClient;
+
+    public BotController(
+        ILogger<BotController> logger,
+        IStoreSteamApiClient storeSteamApiClient
+        )
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
+        _logger = logger;
+        _storeSteamApiClient = storeSteamApiClient;
+    }
 
-        private readonly ILogger<BotController> _logger;
+    [HttpGet]
+    public async Task<ResultData> Get()
+    {
+        var test = await _storeSteamApiClient.GetAppDetails(1228580);
 
-        public BotController(ILogger<BotController> logger)
-        {
-            _logger = logger;
-        }
-
-        [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
-        {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
-        }
+        return test;
     }
 }

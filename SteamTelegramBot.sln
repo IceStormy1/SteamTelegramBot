@@ -3,13 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34322.80
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamTelegramBot", "SteamTelegramBot\SteamTelegramBot.csproj", "{229915CD-61BE-415F-9E76-3EB193E9598F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteamTelegramBot", "SteamTelegramBot\SteamTelegramBot.csproj", "{229915CD-61BE-415F-9E76-3EB193E9598F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamTelegramBot.Core", "SteamTelegramBot.Core\SteamTelegramBot.Core.csproj", "{5DF06985-D3B3-49CB-B8C8-5017ECF9338E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteamTelegramBot.Core", "SteamTelegramBot.Core\SteamTelegramBot.Core.csproj", "{5DF06985-D3B3-49CB-B8C8-5017ECF9338E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamTelegramBot.Data", "SteamTelegramBot.Data\SteamTelegramBot.Data.csproj", "{FE1B9438-453B-40E5-9B98-14C57DD0B87F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteamTelegramBot.Data", "SteamTelegramBot.Data\SteamTelegramBot.Data.csproj", "{FE1B9438-453B-40E5-9B98-14C57DD0B87F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamTelegramBot.Common", "SteamTelegramBot.Common\SteamTelegramBot.Common.csproj", "{7D6D1C42-942B-493F-9EA8-5B01DECD0890}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteamTelegramBot.Common", "SteamTelegramBot.Common\SteamTelegramBot.Common.csproj", "{7D6D1C42-942B-493F-9EA8-5B01DECD0890}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteamTelegramBot.Clients", "SteamTelegramBot.Clients\SteamTelegramBot.Clients.csproj", "{039742F4-75CA-4CD7-AE5F-B9EF9AB01609}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamTelegramBot.Abstractions", "SteamTelegramBot.Abstractions\SteamTelegramBot.Abstractions.csproj", "{AF2B1D57-541F-4C45-8D97-EBAD8DD678F5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +37,14 @@ Global
 		{7D6D1C42-942B-493F-9EA8-5B01DECD0890}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D6D1C42-942B-493F-9EA8-5B01DECD0890}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D6D1C42-942B-493F-9EA8-5B01DECD0890}.Release|Any CPU.Build.0 = Release|Any CPU
+		{039742F4-75CA-4CD7-AE5F-B9EF9AB01609}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{039742F4-75CA-4CD7-AE5F-B9EF9AB01609}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{039742F4-75CA-4CD7-AE5F-B9EF9AB01609}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{039742F4-75CA-4CD7-AE5F-B9EF9AB01609}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF2B1D57-541F-4C45-8D97-EBAD8DD678F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF2B1D57-541F-4C45-8D97-EBAD8DD678F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF2B1D57-541F-4C45-8D97-EBAD8DD678F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF2B1D57-541F-4C45-8D97-EBAD8DD678F5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
