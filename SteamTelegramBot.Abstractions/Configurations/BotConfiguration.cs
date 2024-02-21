@@ -1,4 +1,4 @@
-﻿namespace SteamTelegramBot.Configurations;
+﻿namespace SteamTelegramBot.Abstractions.Configurations;
 
 public sealed class BotConfiguration
 {

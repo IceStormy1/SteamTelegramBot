@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using SteamTelegramBot.Clients.Converters;
+using SteamTelegramBot.Common.Enums;
 
 namespace SteamTelegramBot.Clients.Models;
 
@@ -22,12 +23,6 @@ public sealed class AppDetail
 
     [JsonProperty("steam_appid")]
     public int SteamAppId { get; set; }
-
-    [JsonProperty("detailed_description")]
-    public string DetailedDescription { get; set; }
-
-    [JsonProperty("about_the_game")]
-    public string AboutTheGame { get; set; }
 
     [JsonProperty("short_description")]
     public string ShortDescription { get; set; }

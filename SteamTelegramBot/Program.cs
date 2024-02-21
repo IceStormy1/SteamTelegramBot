@@ -7,10 +7,12 @@ using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Exceptions.Core;
 using SteamTelegramBot.Clients;
+using SteamTelegramBot.Core.Extensions;
+using SteamTelegramBot.Core.Profiles;
 using SteamTelegramBot.Data.Extensions;
 using SteamTelegramBot.Data.Helpers;
+using SteamTelegramBot.Extensions;
 using Swashbuckle.AspNetCore.SwaggerUI;
-using System;
 using Unchase.Swashbuckle.AspNetCore.Extensions.Extensions;
 
 const string apiName = "SteamTelegramBot";
@@ -28,8 +30,11 @@ builder.Host.UseSerilog((ctx, _, cfg) =>
 );
 
 builder.Services
+    .RegisterOptions(builder.Configuration)
     .AddDbContext(builder.Configuration, enableSensitiveData: builder.Environment.IsDevelopment())
+    .AddServices()
     .AddRouting(c => c.LowercaseUrls = true)
+    .AddAutoMapper(x => x.AddMaps(typeof(AbstractProfile).Assembly))
     ;
 
 builder.Services.AddControllers()
