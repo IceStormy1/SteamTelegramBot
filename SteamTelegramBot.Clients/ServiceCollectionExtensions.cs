@@ -1,7 +1,9 @@
 ﻿using System.Net.Sockets;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Refit;
+using Telegram.Bot;
 
 namespace SteamTelegramBot.Clients;
 
@@ -20,12 +22,26 @@ public static class ServiceCollectionExtensions
     /// <param name="clientConfigure"></param>
     public static void AddClients(
         this IServiceCollection services,
+        IConfiguration configuration,
         string baseAddress,
-        Action<IHttpClientBuilder>? clientConfigure = null
+        Action<IHttpClientBuilder> clientConfigure = null
         )
 
     {
-        services.AddClients(new Uri(baseAddress), clientConfigure);
+        var botToken = configuration.GetSection("BotConfiguration:BotToken").Get<string>();
+
+        services.AddClients(new Uri(baseAddress), clientConfigure)
+            .AddTelegramClient(botToken);
+    }
+
+    private static void AddTelegramClient(this IServiceCollection services, string botToken)
+    {
+        services.AddHttpClient("telegram_bot_client")
+            .AddTypedClient<ITelegramBotClient>(httpClient =>
+            {
+                TelegramBotClientOptions options = new(botToken);
+                return new TelegramBotClient(options, httpClient);
+            });
     }
 
     /// <summary>
@@ -34,7 +50,7 @@ public static class ServiceCollectionExtensions
     /// <param name="services">Контейнер зависимостей.</param>
     /// <param name="baseAddress">Базовый адрес для вызовов.</param>
     /// <param name="clientConfigure"></param>
-    private static void AddClients(
+    private static IServiceCollection AddClients(
         this IServiceCollection services, 
         Uri baseAddress,
         Action<IHttpClientBuilder>? clientConfigure = null
@@ -53,6 +69,8 @@ public static class ServiceCollectionExtensions
 
         services.AddRestClient<ISteamWebApiClient>();
         services.AddRestClient<IStoreSteamApiClient>();
+
+        return services;
     }
 
     private static void AddRestClient<T>(this IServiceCollection services) where T : class

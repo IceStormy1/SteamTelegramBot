@@ -1,4 +1,4 @@
-﻿using SteamTelegramBot.Abstractions.Configurations;
+﻿using SteamTelegramBot.Configurations;
 
 namespace SteamTelegramBot.Extensions;
 

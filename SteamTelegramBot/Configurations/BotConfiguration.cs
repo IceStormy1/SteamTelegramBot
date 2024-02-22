@@ -1,4 +1,4 @@
-﻿namespace SteamTelegramBot.Abstractions.Configurations;
+﻿namespace SteamTelegramBot.Configurations;
 
 public sealed class BotConfiguration
 {
@@ -24,4 +24,9 @@ public sealed class BotConfiguration
     /// Secret for hook
     /// </summary>
     public string SecretToken { get; init; } = default!;
+
+    /// <summary>
+    /// If False, the bot will not start
+    /// </summary>
+    public bool IsActive { get; init; } = false;
 }

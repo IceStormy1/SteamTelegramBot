@@ -6,9 +6,8 @@ namespace SteamTelegramBot.Clients;
 public interface IStoreSteamApiClient
 {
     /// <summary>
-    /// Возвращает информацию по залогиненному пользователю
+    /// Returns app details by <paramref name="appids"/>
     /// </summary>
-    /// <returns></returns>
     [Get("/appdetails")]
-    public Task<ResultData> GetAppDetails([Query] int appids, [Query] CountryCode cc = CountryCode.Ru);
+    public Task<AppDetailsResultData> GetAppDetails([Query] int appids, [Query] CountryCode cc = CountryCode.Ru);
 }

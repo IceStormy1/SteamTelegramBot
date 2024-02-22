@@ -7,6 +7,7 @@ using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Exceptions.Core;
 using SteamTelegramBot.Clients;
+using SteamTelegramBot.Configurations;
 using SteamTelegramBot.Core.Extensions;
 using SteamTelegramBot.Core.Profiles;
 using SteamTelegramBot.Data.Extensions;
@@ -36,6 +37,13 @@ builder.Services
     .AddRouting(c => c.LowercaseUrls = true)
     .AddAutoMapper(x => x.AddMaps(typeof(AbstractProfile).Assembly))
     ;
+
+var isNeedToStartupBot = builder.Configuration
+    .GetSection($"{nameof(BotConfiguration)}:{nameof(BotConfiguration.IsActive)}")
+    .Get<bool>();
+
+if (isNeedToStartupBot)
+    builder.Services.AddHostedService<ConfigureWebhook>();
 
 builder.Services.AddControllers()
     .AddNewtonsoftJson(cfg =>
@@ -72,6 +80,7 @@ builder.Services
     })
     .AddClients(
         baseAddress: "http://localhost:7002", 
+        configuration:builder.Configuration,
         clientConfigure: b => b.ConfigureHttpClient(client => client.Timeout = httpClientTimeout)
         );
 

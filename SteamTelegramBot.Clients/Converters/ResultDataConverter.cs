@@ -3,11 +3,11 @@ using SteamTelegramBot.Clients.Models;
 
 namespace SteamTelegramBot.Clients.Converters;
 
-public class ResultDataConverter : JsonConverter<ResultData>
+public class ResultDataConverter : JsonConverter<AppDetailsResultData>
 {
-    public override ResultData ReadJson(JsonReader reader, Type objectType, ResultData existingValue, bool hasExistingValue, JsonSerializer serializer)
+    public override AppDetailsResultData ReadJson(JsonReader reader, Type objectType, AppDetailsResultData existingValue, bool hasExistingValue, JsonSerializer serializer)
     {
-        var rootObject = new ResultData();
+        var rootObject = new AppDetailsResultData();
         if (reader.TokenType != JsonToken.StartObject)
             return null;
 
@@ -36,10 +36,10 @@ public class ResultDataConverter : JsonConverter<ResultData>
         return rootObject;
     }
 
-    public override void WriteJson(JsonWriter writer, ResultData value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, AppDetailsResultData value, JsonSerializer serializer)
     {
         writer.WriteStartObject();
-        writer.WritePropertyName(nameof(ResultData.Item).ToLowerInvariant());
+        writer.WritePropertyName(nameof(AppDetailsResultData.Item).ToLowerInvariant());
         serializer.Serialize(writer, value.Item);
         writer.WriteEndObject();
     }

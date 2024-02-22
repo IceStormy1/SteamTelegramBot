@@ -5,7 +5,7 @@ using SteamTelegramBot.Common.Enums;
 namespace SteamTelegramBot.Clients.Models;
 
 [JsonConverter(typeof(ResultDataConverter))]
-public sealed class ResultData
+public sealed class AppDetailsResultData
 {
     public App Item { get; set; }
 }
