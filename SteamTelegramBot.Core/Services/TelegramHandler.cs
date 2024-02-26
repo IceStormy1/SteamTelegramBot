@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
+using SteamTelegramBot.Abstractions.Exceptions;
 using SteamTelegramBot.Abstractions.Services;
+using SteamTelegramBot.Core.Extensions;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace SteamTelegramBot.Core.Services;
@@ -29,7 +29,10 @@ public sealed class TelegramHandler : BaseService, ITelegramHandler
         }
         catch (Exception e)
         {
-            Logger.LogError(e, "An error occurred while processing the request");
+            var chatId = update.GetChatIdFromRequest();
+
+            if (chatId.HasValue)
+                throw new TelegramException(e, chatId.Value, "Произошла непредвиденная ошибка. Попробуйте ещё раз");
         }
     }
 
@@ -49,14 +52,6 @@ public sealed class TelegramHandler : BaseService, ITelegramHandler
                 await BotOnCallbackQueryReceived(callbackQuery, cancellationToken);
                 break;
 
-            case { InlineQuery: { } inlineQuery }:
-                await BotOnInlineQueryReceived(inlineQuery, cancellationToken);
-                break;
-
-            case { ChosenInlineResult: { } chosenInlineResult }:
-                await BotOnChosenInlineResultReceived(chosenInlineResult, cancellationToken);
-                break;
-
             default:
                 UnknownUpdateHandlerAsync();
                 break;
@@ -72,21 +67,15 @@ public sealed class TelegramHandler : BaseService, ITelegramHandler
         var sentMessage = messageText.Split(' ')[0] switch
         {
             "/inline_keyboard" => await SendInlineKeyboard(message, cancellationToken),
-            _ => await Usage(message, cancellationToken)
+            "/start" => await Usage(message, cancellationToken),
+            _ => await UnknownCommand(message, cancellationToken),
         };
         
         Logger.LogInformation("The message was sent with id: {SentMessageId}", sentMessage.MessageId);
     }
 
-    // Send inline keyboard
-    // You can process responses in BotOnCallbackQueryReceived handler
     private async Task<Message> SendInlineKeyboard(Message message, CancellationToken cancellationToken)
     {
-        //await botClient.SendChatActionAsync(
-        //    chatId: message.Chat.Id,
-        //    chatAction: ChatAction.Typing,
-        //    cancellationToken: cancellationToken);
-
         InlineKeyboardMarkup inlineKeyboard = new(
             new[]
             {
@@ -94,14 +83,11 @@ public sealed class TelegramHandler : BaseService, ITelegramHandler
                 new []
                 {
                     InlineKeyboardButton.WithCallbackData("1.1", "11"),
-                    //InlineKeyboardButton.WithCallbackData("1.2", "12"),
                 },
                 // second row
                 new []
                 {
                     InlineKeyboardButton.WithCallbackData("2.1", "21"),
-                    
-                    //InlineKeyboardButton.WithCallbackData("2.2", "22"),
                 },
             });
 
@@ -128,6 +114,15 @@ public sealed class TelegramHandler : BaseService, ITelegramHandler
             cancellationToken: cancellationToken);
     }
 
+    private async Task<Message> UnknownCommand(Message message, CancellationToken cancellationToken)
+    {
+        return await _botClient.SendTextMessageAsync(
+            chatId: message.Chat.Id,
+            text: "Неизвестная команда. Попробуйте ещё раз",
+            replyMarkup: new ReplyKeyboardRemove(),
+            cancellationToken: cancellationToken);
+    }
+
     // Process Inline Keyboard callback data
     private async Task BotOnCallbackQueryReceived(CallbackQuery callbackQuery, CancellationToken cancellationToken)
     {
@@ -143,40 +138,6 @@ public sealed class TelegramHandler : BaseService, ITelegramHandler
             text: $"Received {callbackQuery.Data}",
             cancellationToken: cancellationToken);
     }
-
-    #region Inline Mode
-
-    private async Task BotOnInlineQueryReceived(InlineQuery inlineQuery, CancellationToken cancellationToken)
-    {
-        Logger.LogInformation("Received inline query from: {InlineQueryFromId}", inlineQuery.From.Id);
-
-        InlineQueryResult[] results = {
-            // displayed result
-            new InlineQueryResultArticle(
-                id: "1",
-                title: "TgBots",
-                inputMessageContent: new InputTextMessageContent("hello"))
-        };
-
-        await _botClient.AnswerInlineQueryAsync(
-            inlineQueryId: inlineQuery.Id,
-            results: results,
-            cacheTime: 0,
-            isPersonal: true,
-            cancellationToken: cancellationToken);
-    }
-
-    private async Task BotOnChosenInlineResultReceived(ChosenInlineResult chosenInlineResult, CancellationToken cancellationToken)
-    {
-        Logger.LogInformation("Received inline result: {ChosenInlineResultId}", chosenInlineResult.ResultId);
-
-        await _botClient.SendTextMessageAsync(
-            chatId: chosenInlineResult.From.Id,
-            text: $"You chose result with Id: {chosenInlineResult.ResultId}",
-            cancellationToken: cancellationToken);
-    }
-
-    #endregion
 
     private void UnknownUpdateHandlerAsync()
         => Logger.LogWarning("Unknown type");

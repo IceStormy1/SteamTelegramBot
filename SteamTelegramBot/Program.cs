@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Diagnostics;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using SteamTelegramBot.Abstractions.Exceptions;
 using SteamTelegramBot.Clients;
 using SteamTelegramBot.Common.Constants;
 using SteamTelegramBot.Core.Extensions;
@@ -8,6 +10,7 @@ using SteamTelegramBot.Data.Extensions;
 using SteamTelegramBot.Data.Helpers;
 using SteamTelegramBot.Extensions;
 using Swashbuckle.AspNetCore.SwaggerUI;
+using Telegram.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,10 +65,38 @@ app
     .UseStatusCodePages()
     .UseHttpsRedirection()
     .UseAuthentication()
-    .UseAuthorization();
+    .UseAuthorization()
+    .UseExceptionHandler(applicationBuilder => applicationBuilder.Run(context => HandleError(context, applicationBuilder.ApplicationServices)));
 
 app.MapControllers();
 
 MigrationTool.Execute(app.Services);
 
 app.Run();
+
+
+static async Task HandleError(HttpContext context, IServiceProvider serviceProvider)
+{
+    var logger = serviceProvider.GetRequiredService<ILogger<HttpContext>>();
+    var telegramClient = serviceProvider.GetRequiredService<ITelegramBotClient>();
+
+    var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+    var exception = exceptionHandlerPathFeature?.Error;
+
+    object logMessage = new
+    {
+        Message = AbstractConstants.InternalError,
+        Path = context.Request.Path.ToString(),
+        context.Request.Method
+    };
+
+    logger.LogError(exception, "{@Response}", logMessage);
+
+    if (exception is TelegramException telegramException)
+    {
+        context.Response.StatusCode = StatusCodes.Status200OK; // Telegram will do a retry in case of an error, so the status is 200
+        await telegramClient.SendTextMessageAsync(
+            chatId: telegramException.ChatId,
+            text: exception.Message);
+    }
+}

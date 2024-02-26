@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
+using SteamTelegramBot.Common.Constants;
 using SteamTelegramBot.Configurations;
 
 namespace SteamTelegramBot.Filters;
@@ -36,7 +37,7 @@ public sealed class ValidateTelegramBot : TypeFilterAttribute
             if (IsValidRequest(context.HttpContext.Request)) 
                 return;
 
-            context.Result = new ObjectResult("\"X-Telegram-Bot-Api-Secret-Token\" is invalid")
+            context.Result = new ObjectResult(AbstractConstants.InvalidApiKey)
             {
                 StatusCode = 403
             };
