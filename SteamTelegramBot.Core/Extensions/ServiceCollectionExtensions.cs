@@ -21,28 +21,21 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection RegisterImplementations(this IServiceCollection services, IEnumerable<Type> implementationTypes)
     {
-        try
+        foreach (var implementationType in implementationTypes)
         {
-            foreach (var implementationType in implementationTypes)
-            {
-                var serviceInterface = implementationType.GetInterfaces();
+            var serviceInterface = implementationType.GetInterfaces();
 
-                if (serviceInterface.Length > 0)
+            if (serviceInterface.Length > 0)
+            {
+                foreach (var @interface in serviceInterface)
                 {
-                    foreach (var @interface in serviceInterface)
-                    {
-                        services.AddScoped(@interface, implementationType);
-                    }
-                }
-                else
-                {
-                    services.AddScoped(implementationType);
+                    services.AddScoped(@interface, implementationType);
                 }
             }
-        }
-        catch (Exception)
-        {
-            // ignored
+            else
+            {
+                services.AddScoped(implementationType);
+            }
         }
 
         return services;

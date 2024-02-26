@@ -12,15 +12,17 @@ namespace SteamTelegramBot.Clients;
 /// </summary>
 public static class ServiceCollectionExtensions
 {
-    private const string HttpClientName = "Sport.PMSM.Community.Clients";
+    private const string HttpClientName = "SteamTelegramBot.Clients";
+    private const string TelegramClientName = "SteamTelegramBot.TelegramBotClient";
 
     /// <summary>
     /// Регистрирует все клиенты в контейнере зависимостей
     /// </summary>
     /// <param name="services">Контейнер зависимостей.</param>
+    /// <param name="configuration"></param>
     /// <param name="baseAddress">Базовый адрес для вызовов.</param>
     /// <param name="clientConfigure"></param>
-    public static void AddClients(
+    public static IServiceCollection AddClients(
         this IServiceCollection services,
         IConfiguration configuration,
         string baseAddress,
@@ -30,18 +32,8 @@ public static class ServiceCollectionExtensions
     {
         var botToken = configuration.GetSection("BotConfiguration:BotToken").Get<string>();
 
-        services.AddClients(new Uri(baseAddress), clientConfigure)
+        return services.AddClients(new Uri(baseAddress), clientConfigure)
             .AddTelegramClient(botToken);
-    }
-
-    private static void AddTelegramClient(this IServiceCollection services, string botToken)
-    {
-        services.AddHttpClient("telegram_bot_client")
-            .AddTypedClient<ITelegramBotClient>(httpClient =>
-            {
-                TelegramBotClientOptions options = new(botToken);
-                return new TelegramBotClient(options, httpClient);
-            });
     }
 
     /// <summary>
@@ -94,5 +86,17 @@ public static class ServiceCollectionExtensions
 
             return RestService.For(httpClient, requestBuilder);
         });
+    }
+
+    private static IServiceCollection AddTelegramClient(this IServiceCollection services, string botToken)
+    {
+        services.AddHttpClient(TelegramClientName)
+            .AddTypedClient<ITelegramBotClient>(httpClient =>
+            {
+                TelegramBotClientOptions options = new(botToken);
+                return new TelegramBotClient(options, httpClient);
+            });
+
+        return services;
     }
 }
