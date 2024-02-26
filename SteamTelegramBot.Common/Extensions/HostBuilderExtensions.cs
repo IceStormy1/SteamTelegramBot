@@ -1,13 +1,14 @@
-﻿using Serilog;
+﻿using Microsoft.Extensions.Hosting;
+using Serilog;
 using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Exceptions.Core;
 
-namespace SteamTelegramBot.Extensions;
+namespace SteamTelegramBot.Common.Extensions;
 
-internal static class HostBuilderExtensions
+public static class HostBuilderExtensions
 {
-    internal static IHostBuilder AddSerilog(this IHostBuilder hostBuilder)
+    public static IHostBuilder AddSerilog(this IHostBuilder hostBuilder)
     {
         return hostBuilder.UseSerilog((ctx, _, cfg) =>
             cfg

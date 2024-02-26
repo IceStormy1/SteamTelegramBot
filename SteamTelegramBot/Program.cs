@@ -4,6 +4,7 @@ using Newtonsoft.Json.Converters;
 using SteamTelegramBot.Abstractions.Exceptions;
 using SteamTelegramBot.Clients;
 using SteamTelegramBot.Common.Constants;
+using SteamTelegramBot.Common.Extensions;
 using SteamTelegramBot.Core.Extensions;
 using SteamTelegramBot.Core.Profiles;
 using SteamTelegramBot.Data.Extensions;
@@ -20,6 +21,7 @@ builder.Services
     .RegisterOptions(builder.Configuration)
     .AddDbContext(builder.Configuration, enableSensitiveData: builder.Environment.IsDevelopment())
     .AddServices()
+    .AddRepositories()
     .AddRouting(c => c.LowercaseUrls = true)
     .AddAutoMapper(x => x.AddMaps(typeof(AbstractProfile).Assembly))
     .AddHostedServices(builder.Configuration)

@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteamTelegramBot.Common", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteamTelegramBot.Clients", "SteamTelegramBot.Clients\SteamTelegramBot.Clients.csproj", "{039742F4-75CA-4CD7-AE5F-B9EF9AB01609}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamTelegramBot.Abstractions", "SteamTelegramBot.Abstractions\SteamTelegramBot.Abstractions.csproj", "{AF2B1D57-541F-4C45-8D97-EBAD8DD678F5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteamTelegramBot.Abstractions", "SteamTelegramBot.Abstractions\SteamTelegramBot.Abstractions.csproj", "{AF2B1D57-541F-4C45-8D97-EBAD8DD678F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamTelegramBot.Jobs", "SteamTelegramBot.Jobs\SteamTelegramBot.Jobs.csproj", "{C78AFC66-EB51-4C11-81E8-9B4AE312A049}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{AF2B1D57-541F-4C45-8D97-EBAD8DD678F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF2B1D57-541F-4C45-8D97-EBAD8DD678F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF2B1D57-541F-4C45-8D97-EBAD8DD678F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C78AFC66-EB51-4C11-81E8-9B4AE312A049}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C78AFC66-EB51-4C11-81E8-9B4AE312A049}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C78AFC66-EB51-4C11-81E8-9B4AE312A049}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C78AFC66-EB51-4C11-81E8-9B4AE312A049}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

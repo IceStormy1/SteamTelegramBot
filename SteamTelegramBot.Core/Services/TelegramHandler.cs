@@ -5,6 +5,7 @@ using SteamTelegramBot.Abstractions.Services;
 using SteamTelegramBot.Core.Extensions;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace SteamTelegramBot.Core.Services;
@@ -89,12 +90,54 @@ public sealed class TelegramHandler : BaseService, ITelegramHandler
                 {
                     InlineKeyboardButton.WithCallbackData("2.1", "21"),
                 },
+                new []
+                {
+                    InlineKeyboardButton.WithSwitchInlineQuery("test query", "test"),
+                },
             });
-
+       
         return await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
             text: "Чтобы ознакомиться с тарифом, выберите необходимый, нажав на соответствующую кнопку",
             replyMarkup: inlineKeyboard,
+            cancellationToken: cancellationToken);
+    }
+
+    // Process Inline Keyboard callback data
+    private async Task BotOnCallbackQueryReceived(CallbackQuery callbackQuery, CancellationToken cancellationToken)
+    {
+        Logger.LogInformation("Received inline keyboard callback from: {CallbackQueryId}", callbackQuery.Id);
+
+        //await _botClient.AnswerCallbackQueryAsync(
+        //    callbackQueryId: callbackQuery.Id,
+        //    text: $"Received {callbackQuery.Data}",
+        //    cancellationToken: cancellationToken);
+
+        InlineKeyboardMarkup inlineKeyboard = new(
+            new[]
+            {
+                // first row
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("1.1test", "11"),
+                },
+                // second row
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("2.1test", "21"),
+                },
+                new []
+                {
+                    InlineKeyboardButton.WithSwitchInlineQuery("test quer1y", "test"),
+                },
+            });
+
+        //await _botClient.EditMessageTextAsync(callbackQuery.Message!.Chat.Id, callbackQuery.Message.MessageId,
+        //    "edited test", replyMarkup: inlineKeyboard, cancellationToken: cancellationToken);
+
+        await _botClient.SendTextMessageAsync(
+            chatId: callbackQuery.Message!.Chat.Id,
+            text: $"Received {callbackQuery.Data}",
             cancellationToken: cancellationToken);
     }
 
@@ -110,7 +153,6 @@ public sealed class TelegramHandler : BaseService, ITelegramHandler
         return await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
             text: usage,
-            replyMarkup: new ReplyKeyboardRemove(),
             cancellationToken: cancellationToken);
     }
 
@@ -119,23 +161,6 @@ public sealed class TelegramHandler : BaseService, ITelegramHandler
         return await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
             text: "Неизвестная команда. Попробуйте ещё раз",
-            replyMarkup: new ReplyKeyboardRemove(),
-            cancellationToken: cancellationToken);
-    }
-
-    // Process Inline Keyboard callback data
-    private async Task BotOnCallbackQueryReceived(CallbackQuery callbackQuery, CancellationToken cancellationToken)
-    {
-        Logger.LogInformation("Received inline keyboard callback from: {CallbackQueryId}", callbackQuery.Id);
-
-        //await _botClient.AnswerCallbackQueryAsync(
-        //    callbackQueryId: callbackQuery.Id,
-        //    text: $"Received {callbackQuery.Data}",
-        //    cancellationToken: cancellationToken);
-        
-        await _botClient.SendTextMessageAsync(
-            chatId: callbackQuery.Message!.Chat.Id,
-            text: $"Received {callbackQuery.Data}",
             cancellationToken: cancellationToken);
     }
 
