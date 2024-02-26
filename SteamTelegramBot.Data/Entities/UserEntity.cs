@@ -9,6 +9,7 @@ public sealed class UserEntity : BaseEntity, IHasCreatedAt, IHasUpdatedAt
     public string Username { get; set; }
 
     public long TelegramId { get; set; }
+    public long TelegramChatId { get; set; }
 
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }

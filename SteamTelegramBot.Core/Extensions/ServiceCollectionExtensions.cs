@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using SteamTelegramBot.Abstractions.Services;
 using SteamTelegramBot.Core.Services;
 
 namespace SteamTelegramBot.Core.Extensions;
@@ -16,7 +17,7 @@ public static class ServiceCollectionExtensions
 
         services.RegisterImplementations(serviceTypes);
 
-        return services;
+        return services.AddScoped<ITelegramHandler, TelegramHandler>();
     }
 
     private static IServiceCollection RegisterImplementations(this IServiceCollection services, IEnumerable<Type> implementationTypes)
