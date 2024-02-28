@@ -9,4 +9,8 @@
     <PackageReference Include="Telegram.Bot" Version="19.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SteamTelegramBot.Common\SteamTelegramBot.Common.csproj" />
+  </ItemGroup>
+
 </Project>

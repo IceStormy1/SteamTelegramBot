@@ -3,7 +3,7 @@ using SteamTelegramBot.Clients.Models;
 
 namespace SteamTelegramBot.Clients.Converters;
 
-public class ResultDataConverter : JsonConverter<AppDetailsResultData>
+public class AppDetailsResultDataConverter : JsonConverter<AppDetailsResultData>
 {
     public override AppDetailsResultData ReadJson(JsonReader reader, Type objectType, AppDetailsResultData existingValue, bool hasExistingValue, JsonSerializer serializer)
     {

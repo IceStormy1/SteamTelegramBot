@@ -24,7 +24,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\SteamTelegramBot.Clients\SteamTelegramBot.Clients.csproj" />
 	  <ProjectReference Include="..\SteamTelegramBot.Core\SteamTelegramBot.Core.csproj" />
 	</ItemGroup>
 

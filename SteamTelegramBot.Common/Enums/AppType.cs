@@ -8,5 +8,6 @@ public enum AppType
     Advertising = 4,
     Mod = 5,
     Video = 6,
-    Music = 7
+    Music = 7,
+    Movie = 8
 }

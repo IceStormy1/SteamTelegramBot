@@ -12,27 +12,23 @@ namespace SteamTelegramBot.Controllers;
 public class BotController : ControllerBase
 {
     private readonly ILogger<BotController> _logger;
-    private readonly IStoreSteamApiClient _storeSteamApiClient;
     private readonly ITelegramHandler _telegramService;
     private readonly ISteamWebApiClient _webApiClient;
 
     public BotController(
         ILogger<BotController> logger,
-        IStoreSteamApiClient storeSteamApiClient, 
         ITelegramHandler telegramService, 
         ISteamWebApiClient webApiClient
         )
     {
         _logger = logger;
-        _storeSteamApiClient = storeSteamApiClient;
         _telegramService = telegramService;
         _webApiClient = webApiClient;
     }
 
     [HttpGet("test")]
-    public async Task<List<AppItemDto>> Test()
+    public async Task<List<AppItem>> Test()
     {
-        var test = await _storeSteamApiClient.GetAppDetails(1228580);
         var test2 = (await _webApiClient.GetAllApps()).Content?.AppList?.Apps?.Where(x => !string.IsNullOrWhiteSpace(x.Name)).ToList();
 
         return test2;

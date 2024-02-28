@@ -60,7 +60,7 @@ public static class ServiceCollectionExtensions
         clientConfigure?.Invoke(clientBuilder);
 
         services.AddRestClient<ISteamWebApiClient>();
-        services.AddRestClient<IStoreSteamApiClient>();
+        services.AddRestClient<IStoreSteamPoweredClient>();
 
         return services;
     }
@@ -76,9 +76,9 @@ public static class ServiceCollectionExtensions
             {
                 httpClient.BaseAddress = new Uri("https://api.steampowered.com/");
             }
-            else if (typeof(T) == typeof(IStoreSteamApiClient))
+            else if (typeof(T) == typeof(IStoreSteamPoweredClient))
             {
-                httpClient.BaseAddress = new Uri("https://store.steampowered.com/api/");
+                httpClient.BaseAddress = new Uri("https://store.steampowered.com");
             }
 
             var refitSettings = new RefitSettings(new NewtonsoftJsonContentSerializer());

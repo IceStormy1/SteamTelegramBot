@@ -5,7 +5,6 @@ using SteamTelegramBot.Abstractions.Services;
 using SteamTelegramBot.Core.Extensions;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace SteamTelegramBot.Core.Services;
@@ -24,6 +23,7 @@ public sealed class TelegramHandler : BaseService, ITelegramHandler
 
     public async Task HandleUpdateAsync(Update update, CancellationToken cancellationToken)
     {
+        // TODO: Добавить в сообщение /start надпись о том, что бот предназначен только для РФ
         try
         {
             await HandleUpdate(update, cancellationToken);

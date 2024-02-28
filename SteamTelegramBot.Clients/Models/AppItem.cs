@@ -7,10 +7,10 @@ public sealed class AppListResultData
 
 public class AppListItem
 {
-    public IReadOnlyCollection<AppItemDto> Apps { get; set; }
+    public IReadOnlyCollection<AppItem> Apps { get; set; }
 }
 
-public sealed class AppItemDto
+public sealed class AppItem
 {
     public int AppId { get; set; }
     public string Name { get; set; }

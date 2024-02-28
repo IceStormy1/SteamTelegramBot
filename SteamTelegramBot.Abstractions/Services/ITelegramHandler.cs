@@ -4,5 +4,5 @@ namespace SteamTelegramBot.Abstractions.Services;
 
 public interface ITelegramHandler
 {
-    public Task HandleUpdateAsync(Update update, CancellationToken cancellationToken);
+    Task HandleUpdateAsync(Update update, CancellationToken cancellationToken);
 }
