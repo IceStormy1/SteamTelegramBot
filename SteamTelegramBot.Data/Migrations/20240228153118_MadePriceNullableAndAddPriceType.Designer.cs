@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SteamTelegramBot.Data;
@@ -11,9 +12,11 @@ using SteamTelegramBot.Data;
 namespace SteamTelegramBot.Data.Migrations
 {
     [DbContext(typeof(SteamTelegramBotDbContext))]
-    partial class SteamTelegramBotDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240228153118_MadePriceNullableAndAddPriceType")]
+    partial class MadePriceNullableAndAddPriceType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,6 +34,7 @@ namespace SteamTelegramBot.Data.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<string>("HeaderImage")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<decimal?>("Price")
