@@ -1,5 +1,5 @@
 ﻿using Refit;
-using SteamTelegramBot.Clients.Models;
+using SteamTelegramBot.Common.Enums;
 
 namespace SteamTelegramBot.Clients;
 

@@ -27,15 +27,15 @@ public class SteamSuggestItem
     public string ImageLink { get; init; }
     public decimal? Price { get; init; }
     public PriceType PriceType { get; init; }
-    public string AppId { get; init; }
+    public int AppId { get; init; }
 
     public SteamSuggestItem(string listingData)
     {
         Name = HandleSpecialCharacters(listingData.Split(GreaterThanSymbol)[2].Split(LessThanSymbol)[0]);
         StoreLink = HandleSpecialCharacters(GetStoreLink(listingData));
-        AppId = HandleSpecialCharacters(GetAppId(listingData));
         ImageLink = HandleSpecialCharacters(GetImageLink(listingData));
 
+        AppId = GetAppId(listingData);
         (PriceType, Price) = GetPricing(listingData);
     }
 
@@ -51,21 +51,36 @@ public class SteamSuggestItem
         return resultLink;
     }
 
-    private static string GetAppId(string input)
-        => input.Split(EqualSign)[1]
+    private static int GetAppId(string input)
+    {
+        var appIdString = input.Split(EqualSign)[1]
             .Replace(Quote, string.Empty)
             .Split(Space)[0];
 
+        return int.Parse(appIdString);
+    }
+
     private static string GetImageLink(string input)
     {
-        var imageLink = input.Split(GreaterThanSymbol)[ImageStartIndex]
-            .Replace(Quote, string.Empty)
-            .Split(EqualSign)[1];
+        try
+        {
+            if (input.Split(GreaterThanSymbol).Length < ImageStartIndex)
+                return null;
 
-        if (imageLink.Contains(LinkQueryStringSeparator))
-            imageLink = imageLink.Split(LinkQueryStringSeparator)[0];
+            var imageLink = input.Split(GreaterThanSymbol)[ImageStartIndex]
+                .Replace(Quote, string.Empty)
+                .Split(EqualSign).ElementAtOrDefault(1);
 
-        return imageLink;
+            if (imageLink?.Contains(LinkQueryStringSeparator) ?? false)
+                imageLink = imageLink.Split(LinkQueryStringSeparator)[0];
+
+            return imageLink;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
     private static (PriceType PriceType, decimal? Price) GetPricing(string input)
@@ -102,6 +117,9 @@ public class SteamSuggestItem
 
     private static string HandleSpecialCharacters(string input)
     {
+        if (string.IsNullOrWhiteSpace(input))
+            return null;
+
         var bytes = Encoding.Default.GetBytes(input);
         return Encoding.UTF8.GetString(bytes);
     }

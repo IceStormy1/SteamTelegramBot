@@ -12,7 +12,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddRepositories(this IServiceCollection services)
     {
-        var serviceTypes = typeof(BaseRepository).Assembly
+        var serviceTypes = typeof(BaseRepository<>).Assembly
             .GetTypes()
             .Where(x => x.Name.EndsWith(RepositorySuffix) && !x.IsAbstract && !x.IsInterface)
             .ToList();

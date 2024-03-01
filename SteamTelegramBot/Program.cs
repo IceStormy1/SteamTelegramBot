@@ -18,7 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.AddSerilog();
 
 builder.Services
-    .RegisterOptions(builder.Configuration)
+    .ConfigureOptions(builder.Configuration)
     .AddDbContext(builder.Configuration, enableSensitiveData: builder.Environment.IsDevelopment())
     .AddServices()
     .AddRepositories()

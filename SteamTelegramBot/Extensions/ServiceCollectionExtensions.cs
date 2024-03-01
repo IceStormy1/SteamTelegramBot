@@ -8,7 +8,7 @@ namespace SteamTelegramBot.Extensions;
 
 internal static class ServiceCollectionExtensions
 {
-    internal static IServiceCollection RegisterOptions(this IServiceCollection services, IConfiguration configuration)
+    internal static IServiceCollection ConfigureOptions(this IServiceCollection services, IConfiguration configuration)
     {
         return services
                 .Configure<BotConfiguration>(configuration.GetSection(nameof(BotConfiguration)))

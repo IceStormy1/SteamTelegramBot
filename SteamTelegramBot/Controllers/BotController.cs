@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using SteamTelegramBot.Abstractions.Services;
 using SteamTelegramBot.Clients;
 using SteamTelegramBot.Clients.Models;
+using SteamTelegramBot.Core.Interfaces;
 using SteamTelegramBot.Filters;
 using Telegram.Bot.Types;
 
@@ -12,12 +12,12 @@ namespace SteamTelegramBot.Controllers;
 public class BotController : ControllerBase
 {
     private readonly ILogger<BotController> _logger;
-    private readonly ITelegramHandler _telegramService;
+    private readonly ITelegramHandleService _telegramService;
     private readonly ISteamWebApiClient _webApiClient;
 
     public BotController(
         ILogger<BotController> logger,
-        ITelegramHandler telegramService, 
+        ITelegramHandleService telegramService, 
         ISteamWebApiClient webApiClient
         )
     {

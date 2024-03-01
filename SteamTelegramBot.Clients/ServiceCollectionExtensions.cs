@@ -45,7 +45,7 @@ public static class ServiceCollectionExtensions
     private static IServiceCollection AddClients(
         this IServiceCollection services, 
         Uri baseAddress,
-        Action<IHttpClientBuilder>? clientConfigure = null
+        Action<IHttpClientBuilder> clientConfigure = null
         )
     {
         var retryTimeouts = Enumerable

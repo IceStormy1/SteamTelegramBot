@@ -11,8 +11,6 @@ internal sealed class SteamAppEntityConfiguration : IEntityTypeConfiguration<Ste
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Title).IsRequired();
-        builder.Property(x => x.ShortDescription).IsRequired();
-        builder.Property(x => x.HeaderImage).IsRequired();
 
         builder.HasIndex(x => x.SteamAppId).IsUnique();
 
