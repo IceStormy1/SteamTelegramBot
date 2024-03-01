@@ -14,5 +14,5 @@ public sealed class UserEntity : BaseEntity, IHasCreatedAt, IHasUpdatedAt
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 
-    public List<UserAppTrackingEntity> TrackedApps { get; set; }
+    public List<UserAppTrackingEntity> TrackedApps { get; set; } = new();
 }
