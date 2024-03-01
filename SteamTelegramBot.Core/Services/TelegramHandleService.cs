@@ -1,24 +1,27 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
 using SteamTelegramBot.Abstractions.Exceptions;
-using SteamTelegramBot.Abstractions.Services;
 using SteamTelegramBot.Core.Extensions;
+using SteamTelegramBot.Core.Interfaces;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace SteamTelegramBot.Core.Services;
 
-public sealed class TelegramHandler : BaseService, ITelegramHandler
+internal sealed class TelegramHandleService : BaseService, ITelegramHandleService
 {
     private readonly ITelegramBotClient _botClient;
+    private readonly IUserService _userService;
 
-    public TelegramHandler(
+    public TelegramHandleService(
         IMapper mapper,
         ILogger<BaseService> logger,
-        ITelegramBotClient botClient) : base(mapper, logger)
+        ITelegramBotClient botClient, 
+        IUserService userService) : base(mapper, logger)
     {
         _botClient = botClient;
+        _userService = userService;
     }
 
     public async Task HandleUpdateAsync(Update update, CancellationToken cancellationToken)
@@ -62,6 +65,9 @@ public sealed class TelegramHandler : BaseService, ITelegramHandler
     private async Task BotOnMessageReceived(Message message, CancellationToken cancellationToken)
     {
         Logger.LogInformation("Receive message type: {MessageType}", message.Type);
+
+        await _userService.AddOrUpdateUser(message.From, message.Chat.Id);
+
         if (message.Text is not { } messageText)
             return;
         
@@ -149,7 +155,7 @@ public sealed class TelegramHandler : BaseService, ITelegramHandler
                              "/remove      - remove custom keyboard\n" +
                              "/request     - request location or contact\n" +
                              "/inline_mode - send keyboard with Inline Query";
-
+      
         return await _botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
             text: usage,
