@@ -8,13 +8,16 @@ namespace SteamTelegramBot.Data.Entities;
 public sealed class UserAppTrackingEntity : BaseEntity, IHasCreatedAt
 {
     public long UserId { get; set; }
+
     /// <inheritdoc cref="UserEntity"/>
     public UserEntity User { get; set; }
 
-
     public long SteamAppId { get; set; }
+
     /// <inheritdoc cref="SteamAppEntity"/>
     public SteamAppEntity SteamApp { get; set; }
 
     public DateTime CreatedAt { get; set; }
+
+    public List<TelegramNotificationEntity> TelegramNotifications { get; set; } = new();
 }

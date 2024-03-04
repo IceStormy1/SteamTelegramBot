@@ -1,6 +1,4 @@
-﻿using SteamTelegramBot.Common.Enums;
-
-namespace SteamTelegramBot.Data.Entities;
+﻿namespace SteamTelegramBot.Data.Entities;
 
 public sealed class SteamAppEntity : BaseEntity
 {
@@ -8,16 +6,7 @@ public sealed class SteamAppEntity : BaseEntity
     public int SteamAppId { get; set; }
     public string HeaderImage { get; set; }
 
-    /// <summary>
-    /// Price of the app
-    /// </summary>
-    /// <remarks>
-    /// null - Free app;
-    /// 0 - The game has become free
-    /// </remarks>
-    public decimal? Price { get; set; }
-
-    public PriceType PriceType { get; set; }
+    public List<SteamAppPriceHistoryEntity> PriceHistory { get; set; } = new();
 
     public List<UserAppTrackingEntity> TrackedUsers { get; set; } = new();
 }
