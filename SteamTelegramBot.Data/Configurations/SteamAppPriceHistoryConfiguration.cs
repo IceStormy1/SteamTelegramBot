@@ -4,15 +4,15 @@ using SteamTelegramBot.Data.Entities;
 
 namespace SteamTelegramBot.Data.Configurations;
 
-internal sealed class UserAppTrackingEntityConfiguration : IEntityTypeConfiguration<UserAppTrackingEntity>
+internal sealed class SteamAppPriceHistoryConfiguration : IEntityTypeConfiguration<SteamAppPriceHistoryEntity>
 {
-    public void Configure(EntityTypeBuilder<UserAppTrackingEntity> builder)
+    public void Configure(EntityTypeBuilder<SteamAppPriceHistoryEntity> builder)
     {
-        builder.HasIndex(x => new { x.UserId, x.SteamAppId })
+        builder.HasIndex(x => new { x.SteamAppId, x.Version })
             .IsUnique();
 
         builder.HasMany(x => x.TelegramNotifications)
-            .WithOne(x => x.UserAppTracking)
+            .WithOne(x => x.SteamAppPrice)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

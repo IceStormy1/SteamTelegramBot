@@ -11,6 +11,8 @@ public sealed class SteamTelegramBotDbContext : DbContext
     public DbSet<UserEntity> Users { get; set; }
     public DbSet<SteamAppEntity> SteamApps { get; set; }
     public DbSet<UserAppTrackingEntity> UserTrackedApps { get; set; }
+    public DbSet<SteamAppPriceHistoryEntity> SteamAppPriceHistory { get; set; }
+    public DbSet<TelegramNotificationEntity> TelegramNotifications { get; set; }
 
     public SteamTelegramBotDbContext(DbContextOptions options) : base(options)
     {

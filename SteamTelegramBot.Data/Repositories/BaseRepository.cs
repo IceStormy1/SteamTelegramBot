@@ -33,11 +33,9 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity>
         await DbContext.SaveChangesAsync();
     }
 
-    public async Task AddRange<TSource>(IReadOnlyCollection<TSource> incoming) where TSource : class
+    public async Task AddRange(IReadOnlyCollection<TEntity> entities)
     {
         // TODO: Z.EntityFramework.Extensions.EFCore
-
-        var entities = Mapper.Map<TEntity>(incoming);
         DbContext.AddRange(entities);
         await DbContext.SaveChangesAsync();
     }
@@ -56,6 +54,11 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity>
     {
         Mapper.MapCollection(source: source, target: entities, find: find);
 
+        await DbContext.SaveChangesAsync();
+    }
+
+    public async Task UpdateRange(List<TEntity> entities)
+    {
         await DbContext.SaveChangesAsync();
     }
 }

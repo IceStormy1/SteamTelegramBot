@@ -4,5 +4,5 @@ namespace SteamTelegramBot.Data.Interfaces;
 
 public interface ISteamAppRepository : IBaseRepository<SteamAppEntity>
 {
-    Task<List<SteamAppEntity>> GetSteamsApplicationsByIds(IReadOnlyCollection<int> steamAppsIds);
+    Task<List<SteamAppEntity>> GetSteamApplicationsByIds(IReadOnlyCollection<int> steamAppsIds);
 }

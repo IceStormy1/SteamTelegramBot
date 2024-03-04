@@ -16,7 +16,7 @@ internal sealed class TelegramHandleService : BaseService, ITelegramHandleServic
 
     public TelegramHandleService(
         IMapper mapper,
-        ILogger<BaseService> logger,
+        ILogger<TelegramHandleService> logger,
         ITelegramBotClient botClient, 
         IUserService userService) : base(mapper, logger)
     {

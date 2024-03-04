@@ -17,20 +17,20 @@ internal sealed class SteamService : BaseService, ISteamService
     private readonly ISteamWebApiClient _steamWebApiClient;
     private readonly IStoreSteamPoweredClient _storeSteamPoweredClient;
     private readonly ISteamAppRepository _steamAppRepository;
-    private readonly ITelegramNotificationService _telegramNotificationService;
+    private readonly ITelegramNotificationRepository _userAppTrackingRepository;
 
     public SteamService(
         IMapper mapper, 
-        ILogger<BaseService> logger,
+        ILogger<SteamService> logger,
         ISteamWebApiClient steamWebApiClient,
         IStoreSteamPoweredClient storeSteamPoweredClient, 
         ISteamAppRepository steamAppRepository,
-        ITelegramNotificationService telegramNotificationService) : base(mapper, logger)
+        ITelegramNotificationRepository userAppTrackingRepository) : base(mapper, logger)
     {
         _steamWebApiClient = steamWebApiClient;
         _storeSteamPoweredClient = storeSteamPoweredClient;
         _steamAppRepository = steamAppRepository;
-        _telegramNotificationService = telegramNotificationService;
+        _userAppTrackingRepository = userAppTrackingRepository;
     }
 
     public async Task<IReadOnlyCollection<AppItemDto>> GetAllSteamApps()
@@ -63,12 +63,13 @@ internal sealed class SteamService : BaseService, ISteamService
             return;
 
         var steamSuggestIds = steamSuggestItems.Select(item => item.AppId).ToList();
-        var existingApps = await _steamAppRepository.GetSteamsApplicationsByIds(steamSuggestIds);
+        var existingApps = await _steamAppRepository.GetSteamApplicationsByIds(steamSuggestIds);
         var existingAppsIds = existingApps.Select(entity => entity.SteamAppId).ToList();
         var newApps = steamSuggestItems.Where(item => !existingAppsIds.Contains(item.AppId)).ToList();
 
         var addedApps = await AddSteamApplications(newApps);
         existingApps.AddRange(addedApps);
+
         await UpdateSteamApplications(steamSuggestItems, existingApps);
     }
 
@@ -78,6 +79,8 @@ internal sealed class SteamService : BaseService, ISteamService
             return new List<SteamAppEntity>();
 
         var newEntities = Mapper.Map<List<SteamAppEntity>>(newSteamApps);
+        AddNewPrice(newSteamApps, newEntities);
+
         await _steamAppRepository.AddRange(newEntities);
 
         return newEntities;
@@ -90,26 +93,47 @@ internal sealed class SteamService : BaseService, ISteamService
 
         var appsWithDifferentPrice = existingSteamApps
             .Where(entity => steamSuggestItems.Any(item => item.AppId == entity.SteamAppId 
-                                                           && item.Price < entity.Price))
+                                                           && item.Price != entity.PriceHistory.MaxBy(x=>x.Version)!.Price
+                                                           ))
             .ToList();
+
+        AddNewPrice(steamSuggestItems, appsWithDifferentPrice);
 
         await _steamAppRepository.UpdateRange(
             source: steamSuggestItems, 
             entities: existingSteamApps, 
             find: (src, target) => target.First(t => t.SteamAppId == src.AppId));
-
-        await NotifyUsers(steamSuggestItems, appsWithDifferentPrice);
     }
 
-    private async Task NotifyUsers(IReadOnlyCollection<SteamSuggestItem> steamSuggestItems, IEnumerable<SteamAppEntity> appsWithDifferentPrice)
+    private static void AddNewPrice(IReadOnlyCollection<SteamSuggestItem> steamSuggestItems, List<SteamAppEntity> steamAppEntities)
+    {
+        foreach (var steamAppEntity in steamAppEntities)
+        {
+            var steamSuggestItem = steamSuggestItems.First(x => x.AppId == steamAppEntity.SteamAppId);
+            var previousVersion = steamAppEntity.PriceHistory.MaxBy(x => x.Version)?.Version ?? default;
+            var telegramNotifications = steamAppEntity.TrackedUsers
+                .Select(x => new TelegramNotificationEntity { UserAppTrackingId = x.Id })
+                .ToList();
+
+            var priceHistory = new SteamAppPriceHistoryEntity
+            {
+                Price = steamSuggestItem.Price,
+                PriceType = steamSuggestItem.PriceType,
+                Version = previousVersion + 1,
+                TelegramNotifications = telegramNotifications
+            };
+
+            steamAppEntity.PriceHistory.Add(priceHistory);
+        }
+    }
+
+    public async Task NotifyUsers(IReadOnlyCollection<SteamSuggestItem> steamSuggestItems, IEnumerable<SteamAppEntity> appsWithDifferentPrice)
     {
         var trackedUsers = appsWithDifferentPrice.SelectMany(x => x.TrackedUsers).ToList();
         if (trackedUsers.Count == default)
             return;
 
         var usersWithDiscountedApps = GetUsersWithDiscountedApps(steamSuggestItems, trackedUsers);
-
-        await _telegramNotificationService.NotifyUsersOfPriceDrop(usersWithDiscountedApps);
     }
 
     private static Dictionary<long, List<SteamSuggestItem>> GetUsersWithDiscountedApps(

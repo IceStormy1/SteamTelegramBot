@@ -9,10 +9,15 @@ public sealed class SteamException : Exception
 
     }
 
-    public SteamException(string message, int steamAppId) : base(message)
+    public SteamException(string message, long steamAppId) : base(message)
     {
         SteamAppId = steamAppId;
     }
 
-    public int? SteamAppId { get; init; }
+    public SteamException(string message) : base(message)
+    {
+        
+    }
+
+    public long? SteamAppId { get; init; }
 }

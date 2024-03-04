@@ -13,7 +13,7 @@ internal sealed class UserService : BaseService, IUserService
 
     public UserService(
         IMapper mapper, 
-        ILogger<BaseService> logger,
+        ILogger<UserService> logger,
         IUserRepository userRepository) : base(mapper, logger)
     {
         _userRepository = userRepository;

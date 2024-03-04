@@ -7,14 +7,18 @@ namespace SteamTelegramBot.Data.Repositories;
 
 internal sealed class SteamAppRepository : BaseRepository<SteamAppEntity>, ISteamAppRepository
 {
-    public SteamAppRepository(SteamTelegramBotDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
+    private const byte MaxPriceHistory = 2;
+    public SteamAppRepository(
+        SteamTelegramBotDbContext dbContext,
+        IMapper mapper) : base(dbContext, mapper)
     {
     }
 
-    public Task<List<SteamAppEntity>> GetSteamsApplicationsByIds(IReadOnlyCollection<int> steamAppsIds)
+    public Task<List<SteamAppEntity>> GetSteamApplicationsByIds(IReadOnlyCollection<int> steamAppsIds)
         => DbContext.SteamApps
             .Include(x => x.TrackedUsers)
                 .ThenInclude(x => x.User)
+            .Include(x=>x.PriceHistory.Take(MaxPriceHistory))
             .Where(x => steamAppsIds.Contains(x.SteamAppId))
             .ToListAsync();
 }

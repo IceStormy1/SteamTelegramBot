@@ -17,5 +17,9 @@ internal sealed class SteamAppEntityConfiguration : IEntityTypeConfiguration<Ste
         builder.HasMany(x => x.TrackedUsers)
             .WithOne(x => x.SteamApp)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(x => x.PriceHistory)
+            .WithOne(x => x.SteamApp)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
