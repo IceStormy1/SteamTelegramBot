@@ -42,7 +42,6 @@ internal sealed class TelegramHandleService : BaseService, ITelegramHandleServic
 
     public async Task HandleUpdateAsync(Update update, CancellationToken cancellationToken)
     {
-        // TODO: Добавить в сообщение /start надпись о том, что бот предназначен только для РФ
         try
         {
             await HandleUpdate(update, cancellationToken);

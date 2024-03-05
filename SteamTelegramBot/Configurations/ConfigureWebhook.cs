@@ -41,8 +41,8 @@ public class ConfigureWebhook : IHostedService
             scope: BotCommandScope.AllPrivateChats(),
             commands: new List<BotCommand>
             {
-                new() { Command = TelegramCommands.StartCommand, Description = "Старт" },
-                new() { Command = TelegramCommands.AddGameCommand, Description = "Добавить игру для отслеживания цены" }
+                new() { Command = TelegramCommands.StartCommand, Description = "РЎС‚Р°СЂС‚" },
+                new() { Command = TelegramCommands.AddGameCommand, Description = "Р”РѕР±Р°РІРёС‚СЊ РёРіСЂСѓ РґР»СЏ РѕС‚СЃР»РµР¶РёРІР°РЅРёСЏ С†РµРЅС‹" }
             });
 
         _logger.LogInformation("Setting webhook was complete");
