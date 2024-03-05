@@ -1,0 +1,29 @@
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using SteamTelegramBot.Data.Entities;
+using SteamTelegramBot.Data.Interfaces;
+
+namespace SteamTelegramBot.Data.Repositories;
+
+internal sealed class UserAppTrackingRepository : BaseRepository<UserAppTrackingEntity>, IUserAppTrackingRepository
+{
+    public UserAppTrackingRepository(SteamTelegramBotDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
+    {
+    }
+
+    public Task<List<SteamAppEntity>> GetTrackedApplicationsByTelegramId(long telegramUserId)
+        => DbSet.AsNoTracking()
+            .Where(x => x.User.TelegramId == telegramUserId)
+            .OrderBy(x=>x.SteamApp.Title)
+            .Select(x => x.SteamApp)
+            .ToListAsync();
+
+    public Task<bool> HasTrackedApplication(long telegramUserId, int steamAppId)
+        => DbSet.AnyAsync(x => x.SteamApp.SteamAppId == steamAppId 
+                               && x.User.TelegramId == telegramUserId);
+
+    public Task<UserAppTrackingEntity> GetUserAppTracking(long telegramUserId, int steamAppId)
+        => DbSet.AsNoTracking()
+            .FirstOrDefaultAsync(x => x.SteamAppId == steamAppId
+                                      && x.User.TelegramId == telegramUserId);
+}

@@ -61,4 +61,10 @@ public abstract class BaseRepository<TEntity> : IBaseRepository<TEntity>
     {
         await DbContext.SaveChangesAsync();
     }
+
+    public async Task Remove(TEntity entity)
+    {
+        DbSet.Remove(entity);
+        await DbContext.SaveChangesAsync();
+    }
 }

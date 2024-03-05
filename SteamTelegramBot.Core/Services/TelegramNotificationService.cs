@@ -59,7 +59,8 @@ internal sealed class TelegramNotificationService : BaseService, ITelegramNotifi
 
     private async Task NotifyUser(long telegramChatId, List<TelegramNotificationEntity> discountedApps)
     {
-        var formattedListOfDiscountedApps = discountedApps.Select((item, index) => item.ToTelegramHyperlink(index));
+        var formattedListOfDiscountedApps = discountedApps
+            .Select((item, index) => item.SteamAppPrice?.SteamApp.ToTelegramHyperlink(index));
 
         var messageText = FormatDiscountedAppsMessage(formattedListOfDiscountedApps);
 

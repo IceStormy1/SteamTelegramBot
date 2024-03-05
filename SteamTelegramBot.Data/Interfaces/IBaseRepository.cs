@@ -18,4 +18,6 @@ public interface IBaseRepository<TEntity> where TEntity : BaseEntity
         where TSource : class;
 
     Task UpdateRange(List<TEntity> entities);
+
+    Task Remove(TEntity entity);
 }

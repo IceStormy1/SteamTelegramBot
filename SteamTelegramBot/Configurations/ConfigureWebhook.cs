@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Options;
+using SteamTelegramBot.Common;
 using Telegram.Bot;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 namespace SteamTelegramBot.Configurations;
@@ -25,18 +27,23 @@ public class ConfigureWebhook : IHostedService
         using var scope = _serviceProvider.CreateScope();
         var botClient = scope.ServiceProvider.GetRequiredService<ITelegramBotClient>();
 
-        // Configure custom endpoint per Telegram API recommendations:
-        // https://core.telegram.org/bots/api#setwebhook
-        // If you'd like to make sure that the webhook was set by you, you can specify secret data
-        // in the parameter secret_token. If specified, the request will contain a header
-        // "X-Telegram-Bot-Api-Secret-Token" with the secret token as content.
         var webHookAddress = $"{_botConfig.HostAddress}{_botConfig.Route}";
         _logger.LogInformation("Setting webhook: {WebHookAddress}", webHookAddress);
+
         await botClient.SetWebhookAsync(
             url: webHookAddress,
             allowedUpdates: Array.Empty<UpdateType>(),
             secretToken: _botConfig.SecretToken,
             cancellationToken: cancellationToken);
+
+        await botClient.SetMyCommandsAsync(
+            cancellationToken: cancellationToken,
+            scope: BotCommandScope.AllPrivateChats(),
+            commands: new List<BotCommand>
+            {
+                new() { Command = TelegramCommands.StartCommand, Description = "Старт" },
+                new() { Command = TelegramCommands.AddGameCommand, Description = "Добавить игру для отслеживания цены" }
+            });
 
         _logger.LogInformation("Setting webhook was complete");
     }

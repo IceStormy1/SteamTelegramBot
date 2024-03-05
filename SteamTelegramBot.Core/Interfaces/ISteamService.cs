@@ -15,8 +15,9 @@ public interface ISteamService
     /// <summary>
     /// Returns basic info for steam application
     /// </summary>
-    /// <param name="steamAppName">Steam application id</param>
-    Task<IReadOnlyCollection<SteamSuggestItem>> GetSteamSuggests(string steamAppName);
+    /// <param name="steamAppName">Steam application name</param>
+    /// <param name="filterByExistingApps">True - returns only those applications that are in the database</param>
+    Task<IReadOnlyCollection<SteamSuggestItem>> GetSteamSuggests(string steamAppName, bool filterByExistingApps = false);
 
     /// <summary>
     /// Updates the existing app if the price is different
