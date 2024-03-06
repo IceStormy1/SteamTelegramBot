@@ -2,6 +2,6 @@
 
 public enum AppAction
 {
-    Add = 1, 
+    Get = 1, 
     Remove = 2
 }

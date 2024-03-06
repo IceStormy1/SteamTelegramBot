@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
+using SteamTelegramBot.Abstractions.Models;
 using SteamTelegramBot.Core.Interfaces;
 using SteamTelegramBot.Data.Entities;
+using SteamTelegramBot.Data.Extensions;
 using SteamTelegramBot.Data.Interfaces;
 
 namespace SteamTelegramBot.Core.Services;
@@ -55,5 +57,11 @@ internal sealed class UserAppTrackingService : BaseService, IUserAppTrackingServ
         await _userAppTrackingRepository.Remove(link);
 
         return (IsSuccess: true, ErrorMessage: null);
+    }
+
+    public async Task<List<TrackedAppItemDto>> GetUserTrackedApps(long telegramUserId)
+    {
+        var trackedApps = await _userAppTrackingRepository.GetTrackedApplicationsByTelegramId(telegramUserId);
+        return trackedApps.Select((app, index) => app.ToTrackedAppItem(index)).ToList();
     }
 }

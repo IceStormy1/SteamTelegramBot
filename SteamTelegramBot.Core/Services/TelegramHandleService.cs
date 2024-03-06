@@ -1,15 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
 using SteamTelegramBot.Abstractions.Exceptions;
-using SteamTelegramBot.Abstractions.Models;
 using SteamTelegramBot.Common;
 using SteamTelegramBot.Common.Constants;
-using SteamTelegramBot.Common.Enums;
+using SteamTelegramBot.Core.Callbacks;
 using SteamTelegramBot.Core.Extensions;
 using SteamTelegramBot.Core.Helpers;
 using SteamTelegramBot.Core.Interfaces;
-using SteamTelegramBot.Data.Extensions;
-using SteamTelegramBot.Data.Interfaces;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -21,23 +18,23 @@ internal sealed class TelegramHandleService : BaseService, ITelegramHandleServic
     private readonly ITelegramBotClient _botClient;
     private readonly IUserService _userService;
     private readonly ISteamService _steamService;
-    private readonly IUserAppTrackingService _userAppTrackingService;
-    private readonly IUserAppTrackingRepository _userAppTrackingRepository;
+    private readonly ITelegramNotificationService _telegramNotificationService;
+    private readonly List<BaseCallback> _callbacks;
 
     public TelegramHandleService(
         IMapper mapper,
         ILogger<TelegramHandleService> logger,
         ITelegramBotClient botClient,
         IUserService userService,
-        IUserAppTrackingRepository userAppTrackingRepository, 
         ISteamService steamService,
-        IUserAppTrackingService userAppTrackingService) : base(mapper, logger)
+        ITelegramNotificationService telegramNotificationService,
+        IEnumerable<BaseCallback> callbacks) : base(mapper, logger)
     {
         _botClient = botClient;
         _userService = userService;
-        _userAppTrackingRepository = userAppTrackingRepository;
         _steamService = steamService;
-        _userAppTrackingService = userAppTrackingService;
+        _telegramNotificationService = telegramNotificationService;
+        _callbacks = callbacks.ToList();
     }
 
     public async Task HandleUpdateAsync(Update update, CancellationToken cancellationToken)
@@ -68,7 +65,7 @@ internal sealed class TelegramHandleService : BaseService, ITelegramHandleServic
                 break;
 
             case { CallbackQuery: { } callbackQuery }:
-                await BotOnCallbackQueryReceived(callbackQuery, cancellationToken);
+                await ExecuteCallback(callbackQuery, cancellationToken);
                 break;
 
             default:
@@ -99,67 +96,18 @@ internal sealed class TelegramHandleService : BaseService, ITelegramHandleServic
         Logger.LogInformation("The message was sent with id: {SentMessageId}", sentMessage.MessageId);
     }
 
-    private async Task BotOnCallbackQueryReceived(CallbackQuery callbackQuery, CancellationToken cancellationToken)
+    private async Task ExecuteCallback(CallbackQuery callbackQuery, CancellationToken cancellationToken)
     {
-        Logger.LogInformation("Received inline keyboard callback from: {CallbackQueryId}", callbackQuery.Id);
+        var callbackNameFromData = callbackQuery.Data?.Split(' ')?.FirstOrDefault();
+        var callback = _callbacks.FirstOrDefault(x => x.Name == callbackQuery.Data || x.Name == callbackNameFromData);
 
-        switch (callbackQuery.Data)
+        if (callback is null)
         {
-            case TelegramConstants.AddAppCallback:
-                await OnAddAppCallback(callbackQuery, cancellationToken);
-                return;
-
-            case TelegramConstants.RemoveAppCallback:
-                await OnRemoveAppCallback(callbackQuery, cancellationToken);
-                return;
-
-            case TelegramConstants.MainMenuCallback:
-                await SendStartInlineKeyBoard(
-                    chatId: callbackQuery.Message!.Chat.Id,
-                    messageId: callbackQuery.Message.MessageId,
-                    cancellationToken: cancellationToken);
-                return;
-
-            case TelegramConstants.FollowedAppsCallback:
-                await OnTrackedAppsCallback(callbackQuery,  cancellationToken);
-                return;
-
-            default:
-                var actionTypeString = callbackQuery.Data?.Split(' ')
-                    .FirstOrDefault(x => x == AppAction.Add.ToString() || x == AppAction.Remove.ToString());
-
-                if (!string.IsNullOrWhiteSpace(actionTypeString) 
-                    && Enum.TryParse<AppAction>(actionTypeString, out var actionType))
-                {
-                    await OnChosenAppCallback(callbackQuery, actionType, cancellationToken);
-                    return;
-                }
-
-                await UnknownCommand(callbackQuery.Message, cancellationToken);
-                return;
+            await UnknownCommand(callbackQuery.Message, cancellationToken);
+            return;
         }
-    }
 
-    private Task OnAddAppCallback(CallbackQuery callbackQuery, CancellationToken cancellationToken)
-        => _botClient.EditMessageTextAsync(
-            chatId: callbackQuery.Message!.Chat.Id,
-            messageId: callbackQuery.Message.MessageId,
-            text: TelegramConstants.AddGameCallbackMessage,
-            replyMarkup: InlineKeyBoardHelper.GetInlineKeyboardByType(InlineKeyBoardType.AddGame),
-            parseMode: ParseMode.MarkdownV2,
-            cancellationToken: cancellationToken);
-
-    private async Task OnRemoveAppCallback(CallbackQuery callbackQuery, CancellationToken cancellationToken)
-    {
-        var trackedApps = await GetUserTrackedApps(callbackQuery.From.Id);
-
-        await _botClient.EditMessageTextAsync(
-            chatId: callbackQuery.Message!.Chat.Id,
-            messageId: callbackQuery.Message.MessageId,
-            text: TelegramConstants.RemoveGameCallbackMessage,
-            replyMarkup: InlineKeyBoardHelper.GetInlineKeyboardByAppAction(trackedApps, AppAction.Remove),
-            parseMode: ParseMode.MarkdownV2,
-            cancellationToken: cancellationToken);
+        await callback.Execute(callbackQuery, cancellationToken);
     }
 
     private async Task<Message> SendStartMessage(Message message, CancellationToken cancellationToken)
@@ -169,76 +117,7 @@ internal sealed class TelegramHandleService : BaseService, ITelegramHandleServic
             text: TelegramConstants.StartMessage,
             cancellationToken: cancellationToken);
 
-        return await SendStartInlineKeyBoard(chatId: message.Chat.Id, cancellationToken);
-    }
-
-    private async Task OnTrackedAppsCallback(CallbackQuery callbackQuery, CancellationToken cancellationToken)
-    {
-        var trackedApps = await GetUserTrackedApps(callbackQuery.From.Id);
-
-        await _botClient.EditMessageTextAsync(
-            callbackQuery.Message!.Chat.Id,
-            callbackQuery.Message.MessageId,
-            text: trackedApps.Count > 0 ? "Список отслеживаемых игр:" : "Пусто",
-            replyMarkup: InlineKeyBoardHelper.GetInlineKeyboardByAppAction(trackedApps, AppAction.Add),
-            cancellationToken: cancellationToken,
-            disableWebPagePreview: true,
-            parseMode: ParseMode.MarkdownV2);
-    }
-
-    private async Task OnChosenAppCallback(CallbackQuery callbackQuery, AppAction appAction, CancellationToken cancellationToken)
-    {
-        var appId = callbackQuery.Data?
-            .Split(new[] { AppAction.Add.ToString(), AppAction.Remove.ToString() }, StringSplitOptions.RemoveEmptyEntries)
-            .ElementAtOrDefault(0);
-
-        if (!int.TryParse(appId, out var parsedAppId))
-            throw new TelegramException(chatId: callbackQuery.Message!.Chat.Id, "Не удалось совершить операцию");
-
-        switch (appAction)
-        {
-            case AppAction.Add:
-                await OnChosenAddAppCallback(callbackQuery, parsedAppId, cancellationToken);
-                break;
-
-            case AppAction.Remove:
-                await OnChosenRemoveAppCallback(callbackQuery, parsedAppId, cancellationToken);
-                break;
-        }
-    }
-
-    private async Task OnChosenAddAppCallback(CallbackQuery callbackQuery, int appId, CancellationToken cancellationToken)
-    {
-        var (isSuccess, errorMessage) = await _userAppTrackingService.LinkUserAndApplication(callbackQuery.From.Id, appId);
-
-        var messageText = isSuccess ? "Игра добавлена в список" : errorMessage;
-
-        await _botClient.SendTextMessageAsync(
-            chatId: callbackQuery.Message!.Chat.Id,
-            text: messageText,
-            cancellationToken: cancellationToken);
-
-        if (isSuccess)
-            await OnTrackedAppsCallback(callbackQuery, cancellationToken);
-    }
-
-    private async Task OnChosenRemoveAppCallback(CallbackQuery callbackQuery, int appId, CancellationToken cancellationToken)
-    {
-        await _userAppTrackingService.RemoveLinkBetweenUserAndApplication(callbackQuery.From.Id, appId);
-
-        var trackedApps = await GetUserTrackedApps(callbackQuery.From.Id);
-
-        await _botClient.EditMessageReplyMarkupAsync(
-            callbackQuery.Message!.Chat.Id,
-            callbackQuery.Message.MessageId,
-            replyMarkup: InlineKeyBoardHelper.GetInlineKeyboardByAppAction(trackedApps, AppAction.Remove),
-            cancellationToken: cancellationToken);
-    }
-
-    private async Task<List<TrackedAppItemDto>> GetUserTrackedApps(long telegramUserId)
-    {
-        var trackedApps = await _userAppTrackingRepository.GetTrackedApplicationsByTelegramId(telegramUserId);
-        return trackedApps.Select((app, index) => app.ToTrackedAppItem(index)).ToList();
+        return await _telegramNotificationService.SendStartInlineKeyBoard(chatId: message.Chat.Id, cancellationToken);
     }
 
     private async Task<Message> UnknownCommand(Message message, CancellationToken cancellationToken)
@@ -248,7 +127,7 @@ internal sealed class TelegramHandleService : BaseService, ITelegramHandleServic
             text: "Неизвестная команда. Попробуйте ещё раз",
             cancellationToken: cancellationToken);
 
-        return await SendStartInlineKeyBoard(message.Chat.Id, cancellationToken);
+        return await _telegramNotificationService.SendStartInlineKeyBoard(message.Chat.Id, cancellationToken);
     }
 
     private async Task<Message> ProcessAddGameCommand(string appName, long chatId, CancellationToken cancellationToken)
@@ -282,27 +161,4 @@ internal sealed class TelegramHandleService : BaseService, ITelegramHandleServic
 
     private void UnknownUpdateHandlerAsync()
         => Logger.LogWarning("Unknown type");
-
-    private async Task<Message> SendStartInlineKeyBoard(long chatId, CancellationToken cancellationToken,
-        int? messageId = null)
-    {
-        const string text = "Для взаимодействия с ботом нажмите на соответствующую кнопку:";
-
-        if (messageId.HasValue)
-        {
-            return await _botClient.EditMessageTextAsync(
-                chatId: chatId,
-                messageId: messageId.Value,
-                text: text,
-                replyMarkup: InlineKeyBoardHelper.GetInlineKeyboardByType(InlineKeyBoardType.Start),
-                cancellationToken: cancellationToken);
-        }
-
-        return await _botClient.SendTextMessageAsync(
-            chatId: chatId,
-            text: text,
-            replyMarkup: InlineKeyBoardHelper.GetInlineKeyboardByType(InlineKeyBoardType.Start),
-            cancellationToken: cancellationToken,
-            disableNotification: true);
-    }
 }

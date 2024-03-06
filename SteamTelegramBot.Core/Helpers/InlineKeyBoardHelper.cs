@@ -22,7 +22,7 @@ public static class InlineKeyBoardHelper
                     },
                     new[]
                     {
-                        InlineKeyboardButton.WithCallbackData("Список отслеживаемых игр", TelegramConstants.FollowedAppsCallback),
+                        InlineKeyboardButton.WithCallbackData("Список отслеживаемых игр", TelegramConstants.TrackedAppsCallback),
                     }
                 };
 
@@ -44,7 +44,7 @@ public static class InlineKeyBoardHelper
     {
         var keyboardButtons = steamSuggestItems.Select(x => new[]
         {
-            InlineKeyboardButton.WithCallbackData(text: x.Name, callbackData: $"{AppAction.Add} {x.AppId}"),
+            InlineKeyboardButton.WithCallbackData(text: x.Name, callbackData: $"{TelegramConstants.ChosenAppCallback} {AppAction.Get} {x.AppId}"),
         });
 
         keyboardButtons = keyboardButtons.Append(GetMainMenuButton());
@@ -57,7 +57,7 @@ public static class InlineKeyBoardHelper
         var keyboardButtons = trackedApps.Select(x => new[]
         {
             appAction == AppAction.Remove
-                ? InlineKeyboardButton.WithCallbackData(text: x.Name, callbackData: $"{AppAction.Remove} {x.Id}")
+                ? InlineKeyboardButton.WithCallbackData(text: x.Name, callbackData: $"{TelegramConstants.ChosenAppCallback} {AppAction.Remove} {x.Id}")
                 : InlineKeyboardButton.WithUrl(text: $"{x.Index}. {x.Name}", url: x.Link),
         });
 

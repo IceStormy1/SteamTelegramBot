@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
+using SteamTelegramBot.Common.Enums;
 using SteamTelegramBot.Common.Extensions;
+using SteamTelegramBot.Core.Helpers;
 using SteamTelegramBot.Core.Interfaces;
 using SteamTelegramBot.Data.Entities;
 using SteamTelegramBot.Data.Extensions;
 using SteamTelegramBot.Data.Interfaces;
 using Telegram.Bot;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 namespace SteamTelegramBot.Core.Services;
@@ -17,18 +20,20 @@ internal sealed class TelegramNotificationService : BaseService, ITelegramNotifi
 
     private readonly ITelegramBotClient _botClient;
     private readonly ITelegramNotificationRepository _telegramNotificationRepository;
+    private readonly IUserAppTrackingService _userAppTrackingService;
     private readonly ILogger<TelegramNotificationService> _logger;
 
     public TelegramNotificationService(
         IMapper mapper, 
         ILogger<TelegramNotificationService> logger, 
         ITelegramBotClient botClient,
-        ITelegramNotificationRepository telegramNotificationRepository, 
-        ILogger<TelegramNotificationService> logger1) : base(mapper, logger)
+        ITelegramNotificationRepository telegramNotificationRepository,
+        IUserAppTrackingService userAppTrackingService) : base(mapper, logger)
     {
         _botClient = botClient;
         _telegramNotificationRepository = telegramNotificationRepository;
-        _logger = logger1;
+        _logger = logger;
+        _userAppTrackingService = userAppTrackingService;
     }
 
     public async Task NotifyUsersOfPriceDrop()
@@ -55,6 +60,42 @@ internal sealed class TelegramNotificationService : BaseService, ITelegramNotifi
         }
 
         _logger.LogInformation("Sent {TotalSentMessages} messages to telegram users", totalSentMessages);
+    }
+
+    public async Task<Message> SendStartInlineKeyBoard(long chatId, CancellationToken cancellationToken, int? messageId = null)
+    {
+        const string text = "Для взаимодействия с ботом нажмите на соответствующую кнопку:";
+
+        if (messageId.HasValue)
+        {
+            return await _botClient.EditMessageTextAsync(
+                chatId: chatId,
+                messageId: messageId.Value,
+                text: text,
+                replyMarkup: InlineKeyBoardHelper.GetInlineKeyboardByType(InlineKeyBoardType.Start),
+                cancellationToken: cancellationToken);
+        }
+
+        return await _botClient.SendTextMessageAsync(
+            chatId: chatId,
+            text: text,
+            replyMarkup: InlineKeyBoardHelper.GetInlineKeyboardByType(InlineKeyBoardType.Start),
+            cancellationToken: cancellationToken,
+            disableNotification: true);
+    }
+
+    public async Task<Message> SendTrackedApps(long chatId, int messageId, long telegramUserId, CancellationToken cancellationToken)
+    {
+        var trackedApps = await _userAppTrackingService.GetUserTrackedApps(telegramUserId);
+
+        return await _botClient.EditMessageTextAsync(
+            chatId,
+            messageId,
+            text: trackedApps.Count > 0 ? "Список отслеживаемых игр:" : "Пусто",
+            replyMarkup: InlineKeyBoardHelper.GetInlineKeyboardByAppAction(trackedApps, AppAction.Get),
+            cancellationToken: cancellationToken,
+            disableWebPagePreview: true,
+            parseMode: ParseMode.MarkdownV2);
     }
 
     private async Task NotifyUser(long telegramChatId, List<TelegramNotificationEntity> discountedApps)
