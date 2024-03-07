@@ -16,7 +16,7 @@ using Telegram.Bot;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.AddSerilog();
-
+builder.Configuration.AddEnvironmentVariables();
 builder.Services
     .ConfigureOptions(builder.Configuration)
     .AddDbContext(builder.Configuration, enableSensitiveData: builder.Environment.IsDevelopment())

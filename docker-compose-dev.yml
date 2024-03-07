@@ -1,0 +1,51 @@
+version: '3.4'
+
+name: steam-telegram-bot
+
+networks:
+  steam-telegram-bot:
+    name: steam-telegram-bot
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: 'postgres'
+    env_file:
+      - .env-dev
+    command: -p 5434
+    restart: always
+    expose:
+      - "5434"
+    ports:
+      - '5434:5434'
+    networks:
+      - steam-telegram-bot
+    volumes: 
+      - ~/.docker-conf/postgres:/var/lib/postgresql/data
+  api:
+    image: ${DOCKER_REGISTRY-}steam-telegram-bot-api
+    container_name: 'steam-telegram-bot-api'
+    build: 
+      context: .
+      dockerfile: steam-telegram-bot-api.dockerfile
+    ports:
+      - "8070:8080"
+    networks:
+      - steam-telegram-bot
+    env_file:
+      - .env-dev
+    depends_on:
+      - postgres
+  
+  jobs:
+    image: ${DOCKER_REGISTRY-}steam-telegram-bot-jobs
+    container_name: 'steam-telegram-bot-jobs'
+    build: 
+      context: .
+      dockerfile: steam-telegram-bot-jobs.dockerfile
+    networks:
+      - steam-telegram-bot
+    env_file:
+      - .env-dev
+    depends_on:
+      - postgres
