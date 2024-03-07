@@ -89,7 +89,7 @@ internal sealed class TelegramHandleService : BaseService, ITelegramHandleServic
         var sentMessage = command switch
         {
             TelegramCommands.StartCommand => await SendStartMessage(message, cancellationToken),
-            TelegramCommands.AddGameCommand => await ProcessAddGameCommand(string.Join(" ", splitMessage, 1, splitMessage.Length -1), message.Chat.Id, cancellationToken),
+            TelegramCommands.AddGameCommand => await ProcessAddGameCommand(string.Join(" ", splitMessage, 1, splitMessage.Length - 1), message.Chat.Id, cancellationToken),
             _ => await UnknownCommand(message, cancellationToken),
         };
 

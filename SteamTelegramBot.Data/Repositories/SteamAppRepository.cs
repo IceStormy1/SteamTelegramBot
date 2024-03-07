@@ -19,7 +19,7 @@ internal sealed class SteamAppRepository : BaseRepository<SteamAppEntity>, IStea
         => DbSet
             .Include(x => x.TrackedUsers)
             .ThenInclude(x => x.User)
-            .Include(x => x.PriceHistory.Take(MaxPriceHistory))
+            .Include(x => x.PriceHistory.OrderByDescending(x=>x.Version).Take(MaxPriceHistory))
             .Where(x => steamAppsIds.Contains(x.SteamAppId))
             .ToListAsync();
 

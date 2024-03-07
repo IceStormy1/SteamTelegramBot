@@ -85,7 +85,8 @@ public class SteamSuggestItem
 
     private static (PriceType PriceType, decimal? Price) GetPricing(string input)
     {
-        var priceCandidate = input.Split(GreaterThanSymbol)[7]
+        var test = input.Split("<div class=\"match_subtitle\">")[1].Split(LessThanSymbol)[0].ToLower();
+        var priceCandidate = input.Split("<div class=\"match_subtitle\">")[1]
             .Split(LessThanSymbol)[0]
             .ToLower();
 

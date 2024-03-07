@@ -73,7 +73,7 @@ internal class CheckingSteamAppsJob : IJob
 
         await using var scope = _scopeServiceProvider.CreateAsyncScope();
         _steamService = scope.ServiceProvider.GetRequiredService<ISteamService>();
-
+        
         try
         {
             var steamSuggestResults = await Task.WhenAll(steamSuggestTasks);
@@ -87,9 +87,10 @@ internal class CheckingSteamAppsJob : IJob
             _totalApplicationsNotFound += updatedApplications.Count - foundedSteamApplications.Count;
             _totalSuccessfulUpdatedApplications += foundedSteamApplications.Count;
 
-            _logger.LogInformation("{ScheduleJob} - Total applications {TotalApplications}; Updated: {TotalUpdated}; Not founded: {TotalNotFounded}",
+            _logger.LogInformation("{ScheduleJob} - Total applications {TotalApplications}; TotalUpdated: {TotalUpdated}; Updated: {TotalSuccessfulUpdatedApplications}; Not founded: {TotalNotFounded}",
                 JobName,
                 _totalApplications,
+                _totalUpdated,
                 _totalSuccessfulUpdatedApplications,
                 _totalApplicationsNotFound);
 

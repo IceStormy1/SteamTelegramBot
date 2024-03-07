@@ -29,4 +29,9 @@ public sealed class BotConfiguration
     /// If False, the bot will not start
     /// </summary>
     public bool IsActive { get; init; } = false;
+
+    /// <summary>
+    /// Bot owner
+    /// </summary>
+    public string OwnerUsername { get; init; } = string.Empty;
 }
