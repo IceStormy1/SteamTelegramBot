@@ -1,0 +1,25 @@
+name: Deploy master
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  prepare-docker:
+    runs-on: self-hosted
+    steps:
+      - name: Clear cache
+        run: docker builder prune -a
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Create network
+        run: docker network create --driver bridge steam-telegram-bot || true
+  build-api:
+    runs-on: self-hosted
+    steps:
+     - name: Build the Docker image
+       run: docker build . --file steam-telegram-bot-api.dockerfile --tag steam-telegram-bot-api
+     - name: Stop steam-telegram-bot-api container
+       run: docker stop steam-telegram-bot-api
+     - name: Run container 
+       run: docker run -it -p 8070:8080 --rm -d --name steam-telegram-bot-api --network steam-telegram-bot --env-file .env-dev steam-telegram-bot-api
