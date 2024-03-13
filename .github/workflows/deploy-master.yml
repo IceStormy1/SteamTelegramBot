@@ -1,25 +1,50 @@
-name: Deploy master
-
+name: Build and Delpoy
+run-name: ${{ github.event.head_commit.message }}
 on:
+  workflow_dispatch:
   push:
     branches: [ "master" ]
 
 jobs:
-  prepare-docker:
-    runs-on: self-hosted
+  prepare-build:
+    runs-on: steam-telegram-bot
     steps:
-      - name: Clear cache
-        run: docker builder prune -a
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Create network
-        run: docker network create --driver bridge steam-telegram-bot || true
-  build-api:
-    runs-on: self-hosted
+      - name: Clone docker-compose
+        uses: GuillaumeFalourd/clone-github-repo-action@v2.3
+        with:
+          owner: 'IceStormy1'
+          repository: 'docker-compose'
+          access-token: ${{ secrets.ACCESS_TOKEN }}
+          branch: 'master'
+
+  build-and-deploy:
+    runs-on: steam-telegram-bot
+    needs: prepare-build
     steps:
-     - name: Build the Docker image
-       run: docker build . --file steam-telegram-bot-api.dockerfile --tag steam-telegram-bot-api
-     - name: Stop steam-telegram-bot-api container
-       run: docker stop steam-telegram-bot-api
-     - name: Run container 
-       run: docker run -it -p 8070:8080 --rm -d --name steam-telegram-bot-api --network steam-telegram-bot --env-file .env-dev steam-telegram-bot-api
+     - name: Stop steam-telegram-bot-api and steam-telegram-bot-jobs containers
+       run: cd docker-compose && docker compose -f docker-compose-steam-tg-prod.yml stop
+
+     # - name: Pull steam-telegram-bot-api container
+     #   run: cd docker-compose && docker compose -f docker-compose-steam-tg-prod.yml pull
+
+     - name: Build steam-telegram-bot-api image
+       run: docker build -t steam-telegram-bot-api -f steam-telegram-bot-api.dockerfile .
+
+     - name: Build steam-telegram-bot-jobs image
+       run: docker build -t steam-telegram-bot-jobs -f steam-telegram-bot-jobs.dockerfile .
+
+     - name: Run containers 
+       run: cd docker-compose && docker compose -f docker-compose-steam-tg-prod.yml up -d
+
+  clean-up:
+    runs-on: steam-telegram-bot
+    needs: build-and-deploy
+    steps:
+      - name: Clean up directory
+        uses: AutoModality/action-clean@v1
+      - name: Clear docker builder cache
+        run: docker builder prune -a -f 
+      - name: Clear docker unused images
+        run: docker image prune -a -f 
