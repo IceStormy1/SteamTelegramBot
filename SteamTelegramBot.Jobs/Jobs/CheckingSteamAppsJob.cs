@@ -11,6 +11,7 @@ internal class CheckingSteamAppsJob : IJob
 {
     private const string JobName = nameof(CheckingSteamAppsJob);
     private const byte MaxUpdatedApplications = 60;
+    private const byte MaxTrackedApplications = 30;
 
     private int _totalApplications;
     private int _totalUpdated;
@@ -22,17 +23,20 @@ internal class CheckingSteamAppsJob : IJob
     private readonly ILogger<CheckingSteamAppsJob> _logger;
     private readonly IServiceScopeFactory _scopeServiceProvider;
     private readonly ITelegramNotificationService _telegramNotificationService;
+    private readonly IUserAppTrackingService _userAppTrackingService;
    
     public CheckingSteamAppsJob(
         ILogger<CheckingSteamAppsJob> logger,
         ISteamService steamService,
         IServiceScopeFactory scopeServiceProvider, 
-        ITelegramNotificationService telegramNotificationService)
+        ITelegramNotificationService telegramNotificationService,
+        IUserAppTrackingService userAppTrackingService)
     {
         _logger = logger;
         _steamService = steamService;
         _scopeServiceProvider = scopeServiceProvider;
         _telegramNotificationService = telegramNotificationService;
+        _userAppTrackingService = userAppTrackingService;
     }
 
     public async Task Execute(IJobExecutionContext context)
@@ -43,6 +47,22 @@ internal class CheckingSteamAppsJob : IJob
 
         _totalApplications = allApplications.Count;
         _logger.LogInformation("{ScheduleJob} - Total applications: {TotalApplications}", JobName, _totalApplications);
+
+        await UpdateApplications(allApplications);
+
+        _logger.LogInformation(
+            "{ScheduleJob} - End of the Steam application update. " +
+            "Total applications: {TotalUpdatedApplications}. " +
+            "Applications not found: {ApplicationsNotFound}",
+            JobName,
+            _totalSuccessfulUpdatedApplications, 
+            _totalApplicationsNotFound);
+    }
+
+    private async Task UpdateApplications(IReadOnlyCollection<AppItemDto> allApplications)
+    {
+        var updatedAppsIds = await UpdateTrackedApplications(allApplications);
+        allApplications = allApplications.Where(x => !updatedAppsIds.Contains(x.AppId)).ToList();
 
         while (true)
         {
@@ -55,37 +75,43 @@ internal class CheckingSteamAppsJob : IJob
 
             await AddOrUpdateSteamApplications(updatedApplications);
         }
+    }
 
-        await _telegramNotificationService.NotifyUsersOfPriceDrop();
+    private async Task<List<int>> UpdateTrackedApplications(IReadOnlyCollection<AppItemDto> allApplications)
+    {
+        var updatedAppsIds = new List<int>();
 
-        _logger.LogInformation(
-            "{ScheduleJob} - End of the Steam application update. " +
-            "Total applications: {TotalUpdatedApplications}. " +
-            "Applications not found: {ApplicationsNotFound}",
-            JobName,
-            _totalSuccessfulUpdatedApplications, 
-            _totalApplicationsNotFound);
+        while (true)
+        {
+            var trackedApplicationIds = 
+                await _userAppTrackingService.GetUsersTrackedAppsIds(limit: MaxTrackedApplications, offset: updatedAppsIds.Count);
+
+            if (trackedApplicationIds.Count == default)
+                break;
+
+            var trackedItems = allApplications.Where(x => trackedApplicationIds.Contains(x.AppId)).ToList();
+            await AddOrUpdateSteamApplications(trackedItems);
+
+            await _telegramNotificationService.NotifyUsersOfPriceDrop(trackedApplicationIds);
+
+            updatedAppsIds.AddRange(trackedApplicationIds);
+        }
+
+        return updatedAppsIds;
     }
 
     private async Task AddOrUpdateSteamApplications(IReadOnlyCollection<AppItemDto> updatedApplications)
     {
-        var steamSuggestTasks = updatedApplications.Select(x => _steamService.GetSteamSuggests(x.Name));
-
         await using var scope = _scopeServiceProvider.CreateAsyncScope();
         _steamService = scope.ServiceProvider.GetRequiredService<ISteamService>();
-        
+
         try
         {
-            var steamSuggestResults = await Task.WhenAll(steamSuggestTasks);
+            var foundedSteamApplications = await FindAndUpdateSteamApplications(updatedApplications);
 
-            var updatedApplicationsIds = updatedApplications.Select(x => x.AppId).ToList();
-            var foundedSteamApplications = CompareSuggestWithItems(steamSuggestResults, updatedApplicationsIds);
-
-            await _steamService.AddOrUpdateSteamApplications(foundedSteamApplications);
-
-            _totalUpdated += MaxUpdatedApplications;
             _totalApplicationsNotFound += updatedApplications.Count - foundedSteamApplications.Count;
             _totalSuccessfulUpdatedApplications += foundedSteamApplications.Count;
+            _totalUpdated += _totalSuccessfulUpdatedApplications + _totalApplicationsNotFound;
 
             _logger.LogInformation("{ScheduleJob} - Total applications {TotalApplications}; TotalUpdated: {TotalUpdated}; Updated: {TotalSuccessfulUpdatedApplications}; Not founded: {TotalNotFounded}",
                 JobName,
@@ -104,6 +130,26 @@ internal class CheckingSteamAppsJob : IJob
         }
     }
 
+    private async Task<List<SteamSuggestItem>> FindAndUpdateSteamApplications(IReadOnlyCollection<AppItemDto> applications)
+    {
+        var steamSuggestResults = await FindSteamApplications(applications);
+
+        var updatedApplicationsIds = applications.Select(x => x.AppId).ToList();
+        var foundedSteamApplications = CompareSuggestWithItems(steamSuggestResults, updatedApplicationsIds);
+
+        await _steamService.AddOrUpdateSteamApplications(foundedSteamApplications);
+
+        return foundedSteamApplications;
+    }
+
+    private async Task<IReadOnlyCollection<SteamSuggestItem>[]> FindSteamApplications(IEnumerable<AppItemDto> applications)
+    {
+        var steamSuggestTasks = applications.Select(x => _steamService.GetSteamSuggests(x.Name));
+        var steamSuggestResults = await Task.WhenAll(steamSuggestTasks);
+
+        return steamSuggestResults;
+    }
+
     private static List<SteamSuggestItem> CompareSuggestWithItems(
         IEnumerable<IReadOnlyCollection<SteamSuggestItem>> steamSuggestResults,
         ICollection<int> updatedAppsIds)
@@ -115,4 +161,6 @@ internal class CheckingSteamAppsJob : IJob
             .OrderBy(x => x.AppId)
             .ToList();
     }
+
+
 }

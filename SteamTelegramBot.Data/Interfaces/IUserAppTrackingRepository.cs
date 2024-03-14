@@ -9,6 +9,7 @@ public interface IUserAppTrackingRepository : IBaseRepository<UserAppTrackingEnt
     /// </summary>
     /// <param name="telegramUserId">User id in Telegram</param>
     Task<List<SteamAppEntity>> GetTrackedApplicationsByTelegramId(long telegramUserId);
+    Task<List<int>> GetTrackedSteamAppIds(short limit, int offset);
 
     /// <summary>
     /// Returns true if link already exists

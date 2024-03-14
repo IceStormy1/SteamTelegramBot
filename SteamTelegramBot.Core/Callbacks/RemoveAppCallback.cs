@@ -21,7 +21,7 @@ internal sealed class RemoveAppCallback : BaseCallback
 
     public override async Task Execute(CallbackQuery callbackQuery, CancellationToken cancellationToken)
     {
-        var trackedApps = await UserAppTrackingService.GetUserTrackedApps(callbackQuery.From.Id);
+        var trackedApps = await UserAppTrackingService.GetAllUserTrackedApps(callbackQuery.From.Id);
 
         await BotClient.EditMessageTextAsync(
             chatId: callbackQuery.Message!.Chat.Id,

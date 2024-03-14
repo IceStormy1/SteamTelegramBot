@@ -59,9 +59,12 @@ internal sealed class UserAppTrackingService : BaseService, IUserAppTrackingServ
         return (IsSuccess: true, ErrorMessage: null);
     }
 
-    public async Task<List<TrackedAppItemDto>> GetUserTrackedApps(long telegramUserId)
+    public async Task<List<TrackedAppItemDto>> GetAllUserTrackedApps(long telegramUserId)
     {
         var trackedApps = await _userAppTrackingRepository.GetTrackedApplicationsByTelegramId(telegramUserId);
         return trackedApps.Select((app, index) => app.ToTrackedAppItem(index)).ToList();
     }
+
+    public Task<List<int>> GetUsersTrackedAppsIds(short limit, int offset)
+        => _userAppTrackingRepository.GetTrackedSteamAppIds(limit, offset);
 }

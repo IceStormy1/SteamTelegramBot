@@ -18,6 +18,15 @@ internal sealed class UserAppTrackingRepository : BaseRepository<UserAppTracking
             .Select(x => x.SteamApp)
             .ToListAsync();
 
+    public Task<List<int>> GetTrackedSteamAppIds(short limit, int offset)
+        => DbSet.AsNoTracking()
+            .GroupBy(x => x.SteamAppId)
+            .OrderBy(x => x.Key)
+            .Skip(offset)
+            .Take(limit)
+            .Select(x => x.First().SteamApp.SteamAppId)
+            .ToListAsync();
+
     public Task<bool> HasTrackedApplication(long telegramUserId, int steamAppId)
         => DbSet.AnyAsync(x => x.SteamApp.SteamAppId == steamAppId 
                                && x.User.TelegramId == telegramUserId);

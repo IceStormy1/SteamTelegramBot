@@ -5,8 +5,7 @@ using SteamTelegramBot.Data.Interfaces;
 
 namespace SteamTelegramBot.Data.Repositories;
 
-internal sealed class TelegramNotificationRepository : BaseRepository<TelegramNotificationEntity>,
-    ITelegramNotificationRepository
+internal sealed class TelegramNotificationRepository : BaseRepository<TelegramNotificationEntity>, ITelegramNotificationRepository
 {
     public TelegramNotificationRepository(
         SteamTelegramBotDbContext dbContext,
@@ -14,23 +13,21 @@ internal sealed class TelegramNotificationRepository : BaseRepository<TelegramNo
     {
     }
 
-    public async Task<Dictionary<long, List<TelegramNotificationEntity>>> GetUnNotifiedUsers(byte limit, int offset)
+    public async Task<Dictionary<long, List<TelegramNotificationEntity>>> GetUnNotifiedUsers(List<int> applicationIds)
     {
         var usersWithUnsentNotifications = await DbContext.TelegramNotifications
             .Include(c => c.UserAppTracking)
             .Include(c => c.SteamAppPrice)
                 .ThenInclude(x => x.SteamApp)
-            .Where(x => !x.WasSent)
+            .Where(x => !x.WasSent && applicationIds.Contains(x.SteamAppPrice.SteamApp.SteamAppId))
             .GroupBy(x => x.UserAppTracking.User.TelegramChatId)
-            .Skip(offset)
-            .Take(limit)
             .Select(x => new
             {
-                UserId = x.Key,
+                TelegramChatId = x.Key,
                 Notifications = x.Select(c => c)
             })
             .ToDictionaryAsync(
-                x => x.UserId,
+                x => x.TelegramChatId,
                 x => x.Notifications.ToList());
 
         return usersWithUnsentNotifications;

@@ -29,6 +29,11 @@ public class SteamSuggestItem
     public PriceType PriceType { get; init; }
     public int AppId { get; init; }
 
+    public SteamSuggestItem()
+    {
+        
+    }
+
     public SteamSuggestItem(string listingData)
     {
         Name = HandleSpecialCharacters(listingData.Split(GreaterThanSymbol)[2].Split(LessThanSymbol)[0]);

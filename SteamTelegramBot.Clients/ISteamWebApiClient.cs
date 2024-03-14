@@ -11,6 +11,6 @@ public interface ISteamWebApiClient
     /// <remarks>
     /// There is no paging in this method
     /// </remarks>
-    [Get("/ISteamApps/GetAppList/v2/")]
-    public Task<IApiResponse<AppListResultData>> GetAllApps();
+    [Get("/ISteamApps/GetAppList/v2")]
+    public Task<IApiResponse<AppListResultData>> GetAllApps([Query] string format = "json");
 }

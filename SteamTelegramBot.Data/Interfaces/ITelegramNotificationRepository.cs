@@ -7,5 +7,5 @@ public interface ITelegramNotificationRepository : IBaseRepository<TelegramNotif
     /// <returns>
     /// Key - telegram chat id; Value - Unsent notifications
     /// </returns>
-    Task<Dictionary<long, List<TelegramNotificationEntity>>> GetUnNotifiedUsers(byte limit, int offset);
+    Task<Dictionary<long, List<TelegramNotificationEntity>>> GetUnNotifiedUsers(List<int> applicationIds);
 }

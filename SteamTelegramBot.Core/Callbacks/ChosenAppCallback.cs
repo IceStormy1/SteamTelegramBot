@@ -78,7 +78,7 @@ internal class ChosenAppCallback : BaseCallback
     {
         await UserAppTrackingService.RemoveLinkBetweenUserAndApplication(callbackQuery.From.Id, appId);
 
-        var trackedApps = await UserAppTrackingService.GetUserTrackedApps(callbackQuery.From.Id);
+        var trackedApps = await UserAppTrackingService.GetAllUserTrackedApps(callbackQuery.From.Id);
 
         await BotClient.EditMessageReplyMarkupAsync(
             callbackQuery.Message!.Chat.Id,

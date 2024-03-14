@@ -15,9 +15,6 @@ namespace SteamTelegramBot.Core.Services;
 
 internal sealed class TelegramNotificationService : BaseService, ITelegramNotificationService
 {
-    private const byte LimitOfSentMessages = 30;
-    private const byte TelegramMessageDelayInSeconds = 1;
-
     private readonly ITelegramBotClient _botClient;
     private readonly ITelegramNotificationRepository _telegramNotificationRepository;
     private readonly IUserAppTrackingService _userAppTrackingService;
@@ -36,30 +33,20 @@ internal sealed class TelegramNotificationService : BaseService, ITelegramNotifi
         _userAppTrackingService = userAppTrackingService;
     }
 
-    public async Task NotifyUsersOfPriceDrop()
+    public async Task NotifyUsersOfPriceDrop(List<int> applicationIds)
     {
-        var totalSentMessages = 0;
+        var unNotifiedUsers = await _telegramNotificationRepository.GetUnNotifiedUsers(applicationIds);
 
-        while (true)
-        {
-            var unNotifiedUsers = await _telegramNotificationRepository.GetUnNotifiedUsers(limit: LimitOfSentMessages, totalSentMessages);
+        if (unNotifiedUsers.Count == default)
+            return;
 
-            if(unNotifiedUsers.Count == default)
-                break;
+        var tasks = unNotifiedUsers.Select(pair => NotifyUser(pair.Key, pair.Value));
+        await Task.WhenAll(tasks);
 
-            var tasks = unNotifiedUsers.Select(pair => NotifyUser(pair.Key, pair.Value));
-            await Task.WhenAll(tasks);
+        var notifications = unNotifiedUsers.SelectMany(x => x.Value).ToList();
+        await MarkMessageAsSent(notifications);
 
-            var notifications = unNotifiedUsers.SelectMany(x => x.Value).ToList();
-            await MarkMessageAsSent(notifications);
-
-            // Telegram doc: https://core.telegram.org/bots/faq#my-bot-is-hitting-limits-how-do-i-avoid-this
-            await Task.Delay(TimeSpan.FromSeconds(TelegramMessageDelayInSeconds));
-
-            totalSentMessages += unNotifiedUsers.Count;
-        }
-
-        _logger.LogInformation("Sent {TotalSentMessages} messages to telegram users", totalSentMessages);
+        _logger.LogInformation("Sent {TotalSentMessages} messages to telegram users", unNotifiedUsers.Count);
     }
 
     public async Task<Message> SendStartInlineKeyBoard(long chatId, CancellationToken cancellationToken, int? messageId = null)
@@ -86,7 +73,7 @@ internal sealed class TelegramNotificationService : BaseService, ITelegramNotifi
 
     public async Task<Message> SendTrackedApps(long chatId, int messageId, long telegramUserId, CancellationToken cancellationToken)
     {
-        var trackedApps = await _userAppTrackingService.GetUserTrackedApps(telegramUserId);
+        var trackedApps = await _userAppTrackingService.GetAllUserTrackedApps(telegramUserId);
 
         return await _botClient.EditMessageTextAsync(
             chatId,
