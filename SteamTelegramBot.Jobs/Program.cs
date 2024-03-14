@@ -53,6 +53,4 @@ var host = Host.CreateDefaultBuilder(args)
 
 var app = host.Build();
 
-MigrationTool.Execute(app.Services);
-
 await app.RunAsync();
