@@ -23,7 +23,7 @@ internal sealed class SteamAppRepository : BaseRepository<SteamAppEntity>, IStea
             .Where(x => steamAppsIds.Contains(x.SteamAppId))
             .ToListAsync();
 
-    public Task<SteamAppEntity> GetSteamApplicationById(int steamAppId)
+    public Task<SteamAppEntity> GetSteamApplicationById(long steamAppId)
         => DbSet.AsNoTracking()
             .FirstOrDefaultAsync(x => x.SteamAppId == steamAppId);
 

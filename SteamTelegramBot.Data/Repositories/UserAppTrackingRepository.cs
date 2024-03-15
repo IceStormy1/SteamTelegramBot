@@ -27,11 +27,11 @@ internal sealed class UserAppTrackingRepository : BaseRepository<UserAppTracking
             .Select(x => x.First().SteamApp.SteamAppId)
             .ToListAsync();
 
-    public Task<bool> HasTrackedApplication(long telegramUserId, int steamAppId)
-        => DbSet.AnyAsync(x => x.SteamApp.SteamAppId == steamAppId 
+    public Task<bool> HasTrackedApplication(long telegramUserId, long steamApplicationId)
+        => DbSet.AnyAsync(x => x.SteamApp.SteamAppId == steamApplicationId 
                                && x.User.TelegramId == telegramUserId);
 
-    public Task<UserAppTrackingEntity> GetUserAppTracking(long telegramUserId, int steamAppId)
+    public Task<UserAppTrackingEntity> GetUserAppTracking(long telegramUserId, long steamAppId)
         => DbSet.AsNoTracking()
             .FirstOrDefaultAsync(x => x.SteamAppId == steamAppId
                                       && x.User.TelegramId == telegramUserId);

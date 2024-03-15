@@ -1,6 +1,7 @@
 ﻿using SteamTelegramBot.Abstractions.Models;
-using SteamTelegramBot.Common.Constants;
+using SteamTelegramBot.Abstractions.Models.Callbacks;
 using SteamTelegramBot.Common.Enums;
+using SteamTelegramBot.Common.Extensions;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace SteamTelegramBot.Core.Helpers;
@@ -17,12 +18,12 @@ public static class InlineKeyBoardHelper
                 {
                     new[]
                     {
-                        InlineKeyboardButton.WithCallbackData("Добавить игру в список", TelegramConstants.AddAppCallback),
-                        InlineKeyboardButton.WithCallbackData("Удалить игру из списка", TelegramConstants.RemoveAppCallback),
+                        InlineKeyboardButton.WithCallbackData("Добавить игру в список", new AddAppCallbackDto().Serialize()),
+                        InlineKeyboardButton.WithCallbackData("Удалить игру из списка", new RemoveAppCallbackDto().Serialize()),
                     },
                     new[]
                     {
-                        InlineKeyboardButton.WithCallbackData("Список отслеживаемых игр", TelegramConstants.TrackedAppsCallback),
+                        InlineKeyboardButton.WithCallbackData("Список отслеживаемых игр", new TrackedAppsCallbackDto().Serialize())
                     }
                 };
 
@@ -44,7 +45,9 @@ public static class InlineKeyBoardHelper
     {
         var keyboardButtons = steamSuggestItems.Select(x => new[]
         {
-            InlineKeyboardButton.WithCallbackData(text: x.Name, callbackData: $"{TelegramConstants.ChosenAppCallback} {AppAction.Get} {x.AppId}"),
+            InlineKeyboardButton.WithCallbackData(
+                text: x.Name,
+                callbackData: new ChosenAppCallbackDto { Action = AppAction.Add, AppId = x.AppId }.Serialize()),
         });
 
         keyboardButtons = keyboardButtons.Append(GetMainMenuButton());
@@ -57,7 +60,9 @@ public static class InlineKeyBoardHelper
         var keyboardButtons = trackedApps.Select(x => new[]
         {
             appAction == AppAction.Remove
-                ? InlineKeyboardButton.WithCallbackData(text: x.Name, callbackData: $"{TelegramConstants.ChosenAppCallback} {AppAction.Remove} {x.Id}")
+                ? InlineKeyboardButton.WithCallbackData(
+                    text: x.Name,
+                    callbackData: new ChosenAppCallbackDto { Action = AppAction.Remove, AppId = x.Id }.Serialize())
                 : InlineKeyboardButton.WithUrl(text: $"{x.Index}. {x.Name}", url: x.Link),
         });
 
@@ -69,6 +74,6 @@ public static class InlineKeyBoardHelper
     private static InlineKeyboardButton[] GetMainMenuButton()
         => new[]
         {
-            InlineKeyboardButton.WithCallbackData("Вернуться в главное меню", TelegramConstants.MainMenuCallback)
+            InlineKeyboardButton.WithCallbackData("Вернуться в главное меню", new MainMenuCallbackDto().Serialize())
         };
 }

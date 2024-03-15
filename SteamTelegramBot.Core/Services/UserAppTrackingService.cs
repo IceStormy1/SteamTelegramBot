@@ -26,7 +26,7 @@ internal sealed class UserAppTrackingService : BaseService, IUserAppTrackingServ
         _steamAppRepository = steamAppRepository;
     }
 
-    public async Task<(bool IsSuccess, string ErrorMessage)> LinkUserAndApplication(long telegramUserId, int steamApplicationId)
+    public async Task<(bool IsSuccess, string ErrorMessage)> LinkUserAndApplication(long telegramUserId, long steamApplicationId)
     {
         var hasLink = await _userAppTrackingRepository.HasTrackedApplication(telegramUserId, steamApplicationId);
 
@@ -47,7 +47,7 @@ internal sealed class UserAppTrackingService : BaseService, IUserAppTrackingServ
         return (IsSuccess: true, ErrorMessage: null);
     }
 
-    public async Task<(bool IsSuccess, string ErrorMessage)> RemoveLinkBetweenUserAndApplication(long telegramUserId, int steamApplicationId)
+    public async Task<(bool IsSuccess, string ErrorMessage)> RemoveLinkBetweenUserAndApplication(long telegramUserId, long steamApplicationId)
     {
         var link = await _userAppTrackingRepository.GetUserAppTracking(telegramUserId, steamApplicationId);
 

@@ -15,8 +15,8 @@ public interface IUserAppTrackingRepository : IBaseRepository<UserAppTrackingEnt
     /// Returns true if link already exists
     /// </summary>
     /// <param name="telegramUserId">User id in Telegram</param>
-    /// <param name="steamAppId">Steam application id <see cref="SteamAppEntity.SteamAppId"/></param>
-    Task<bool> HasTrackedApplication(long telegramUserId, int steamAppId);
+    /// <param name="steamApplicationId">Steam application id <see cref="SteamAppEntity.SteamAppId"/></param>
+    Task<bool> HasTrackedApplication(long telegramUserId, long steamApplicationId);
 
-    Task<UserAppTrackingEntity> GetUserAppTracking(long telegramUserId, int steamAppId);
+    Task<UserAppTrackingEntity> GetUserAppTracking(long telegramUserId, long steamAppId);
 }

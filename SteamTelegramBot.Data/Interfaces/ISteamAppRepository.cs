@@ -5,7 +5,7 @@ namespace SteamTelegramBot.Data.Interfaces;
 public interface ISteamAppRepository : IBaseRepository<SteamAppEntity>
 {
     Task<List<SteamAppEntity>> GetSteamApplicationsByIds(ICollection<int> steamAppsIds);
-    Task<SteamAppEntity> GetSteamApplicationById(int steamAppId);
+    Task<SteamAppEntity> GetSteamApplicationById(long steamAppId);
 
     /// <summary>
     /// Returns <see cref="SteamAppEntity.SteamAppId"/> that already exists by <paramref name="steamAppsIds"/>

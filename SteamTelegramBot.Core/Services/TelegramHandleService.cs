@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using SteamTelegramBot.Abstractions.Exceptions;
+using SteamTelegramBot.Abstractions.Models.Callbacks;
 using SteamTelegramBot.Common;
 using SteamTelegramBot.Common.Constants;
 using SteamTelegramBot.Core.Callbacks;
@@ -98,8 +100,8 @@ internal sealed class TelegramHandleService : BaseService, ITelegramHandleServic
 
     private async Task ExecuteCallback(CallbackQuery callbackQuery, CancellationToken cancellationToken)
     {
-        var callbackNameFromData = callbackQuery.Data?.Split(' ').FirstOrDefault();
-        var callback = _callbacks.FirstOrDefault(x => x.Name == callbackQuery.Data || x.Name == callbackNameFromData);
+        var callbackDto = JsonConvert.DeserializeObject<BaseCallbackDto>(callbackQuery.Data ?? string.Empty);
+        var callback = _callbacks.FirstOrDefault(x => x.Name == callbackDto?.CallbackName);
 
         if (callback is null)
         {

@@ -1,4 +1,5 @@
-﻿using SteamTelegramBot.Abstractions.Exceptions;
+﻿using Newtonsoft.Json;
+using SteamTelegramBot.Abstractions.Models.Callbacks;
 using SteamTelegramBot.Common.Constants;
 using SteamTelegramBot.Common.Enums;
 using SteamTelegramBot.Core.Helpers;
@@ -21,38 +22,25 @@ internal class ChosenAppCallback : BaseCallback
 
     public override async Task Execute(CallbackQuery callbackQuery, CancellationToken cancellationToken)
     {
-        var actionTypeString = callbackQuery.Data?.Split(' ')
-            .FirstOrDefault(x => x == AppAction.Get.ToString() || x == AppAction.Remove.ToString());
-
-        if (!string.IsNullOrWhiteSpace(actionTypeString)
-            && Enum.TryParse<AppAction>(actionTypeString, out var actionType))
-        {
-            await OnChosenAppCallback(callbackQuery, actionType, cancellationToken); 
-        }
+        var chosenAppDto = JsonConvert.DeserializeObject<ChosenAppCallbackDto>(callbackQuery.Data ?? string.Empty);
+        await OnChosenAppCallback(callbackQuery, chosenAppDto, cancellationToken);
     }
 
-    private async Task OnChosenAppCallback(CallbackQuery callbackQuery, AppAction appAction, CancellationToken cancellationToken)
+    private async Task OnChosenAppCallback(CallbackQuery callbackQuery, ChosenAppCallbackDto chosenAppDto, CancellationToken cancellationToken)
     {
-        var appId = callbackQuery.Data?
-            .Split(new[] { AppAction.Get.ToString(), AppAction.Remove.ToString() }, StringSplitOptions.RemoveEmptyEntries)
-            .ElementAtOrDefault(1);
-
-        if (!int.TryParse(appId, out var parsedAppId))
-            throw new TelegramException(chatId: callbackQuery.Message!.Chat.Id, "Не удалось совершить операцию");
-
-        switch (appAction)
+        switch (chosenAppDto.Action)
         {
-            case AppAction.Get:
-                await OnChosenAddAppCallback(callbackQuery, parsedAppId, cancellationToken);
+            case AppAction.Add:
+                await OnChosenAddAppCallback(callbackQuery, chosenAppDto.AppId, cancellationToken);
                 break;
 
             case AppAction.Remove:
-                await OnChosenRemoveAppCallback(callbackQuery, parsedAppId, cancellationToken);
+                await OnChosenRemoveAppCallback(callbackQuery, chosenAppDto.AppId, cancellationToken);
                 break;
         }
     }
 
-    private async Task OnChosenAddAppCallback(CallbackQuery callbackQuery, int appId, CancellationToken cancellationToken)
+    private async Task OnChosenAddAppCallback(CallbackQuery callbackQuery, long appId, CancellationToken cancellationToken)
     {
         var (isSuccess, errorMessage) = await UserAppTrackingService.LinkUserAndApplication(callbackQuery.From.Id, appId);
 
@@ -74,7 +62,7 @@ internal class ChosenAppCallback : BaseCallback
             showAlert: true);
     }
 
-    private async Task OnChosenRemoveAppCallback(CallbackQuery callbackQuery, int appId, CancellationToken cancellationToken)
+    private async Task OnChosenRemoveAppCallback(CallbackQuery callbackQuery, long appId, CancellationToken cancellationToken)
     {
         await UserAppTrackingService.RemoveLinkBetweenUserAndApplication(callbackQuery.From.Id, appId);
 

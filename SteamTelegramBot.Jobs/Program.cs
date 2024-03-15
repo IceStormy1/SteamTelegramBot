@@ -7,7 +7,6 @@ using SteamTelegramBot.Common.Extensions;
 using SteamTelegramBot.Core.Extensions;
 using SteamTelegramBot.Core.Profiles;
 using SteamTelegramBot.Data.Extensions;
-using SteamTelegramBot.Data.Helpers;
 using SteamTelegramBot.Jobs.Extensions;
 using SteamTelegramBot.Jobs.Jobs;
 
