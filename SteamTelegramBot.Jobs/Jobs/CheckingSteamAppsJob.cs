@@ -111,7 +111,7 @@ internal class CheckingSteamAppsJob : IJob
 
             _totalApplicationsNotFound += updatedApplications.Count - foundedSteamApplications.Count;
             _totalSuccessfulUpdatedApplications += foundedSteamApplications.Count;
-            _totalUpdated += _totalSuccessfulUpdatedApplications + _totalApplicationsNotFound;
+            _totalUpdated = _totalSuccessfulUpdatedApplications + _totalApplicationsNotFound;
 
             _logger.LogInformation("{ScheduleJob} - Total applications {TotalApplications}; TotalUpdated: {TotalUpdated}; Updated: {TotalSuccessfulUpdatedApplications}; Not founded: {TotalNotFounded}",
                 JobName,
