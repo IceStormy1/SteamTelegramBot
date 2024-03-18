@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
 using SteamTelegramBot.Abstractions.Models;
+using SteamTelegramBot.Abstractions.Models.Applications;
 using SteamTelegramBot.Core.Interfaces;
 using SteamTelegramBot.Data.Entities;
 using SteamTelegramBot.Data.Extensions;
@@ -59,10 +60,15 @@ internal sealed class UserAppTrackingService : BaseService, IUserAppTrackingServ
         return (IsSuccess: true, ErrorMessage: null);
     }
 
-    public async Task<List<TrackedAppItemDto>> GetAllUserTrackedApps(long telegramUserId)
+    public async Task<ListResponseDto<TrackedAppItemDto>> GetUserTrackedApps(long telegramUserId, byte limit, int offset)
     {
-        var trackedApps = await _userAppTrackingRepository.GetTrackedApplicationsByTelegramId(telegramUserId);
-        return trackedApps.Select((app, index) => app.ToTrackedAppItem(index)).ToList();
+        var trackedApps = await _userAppTrackingRepository.GetTrackedApplicationsByTelegramId(telegramUserId, limit, offset);
+
+        return new ListResponseDto<TrackedAppItemDto>
+        {
+            Total = trackedApps.Total,
+            Items = trackedApps.Items.Select((app, index) => app.ToTrackedAppItem(offset + index)).ToList()
+        };
     }
 
     public Task<List<int>> GetUsersTrackedAppsIds(short limit, int offset)

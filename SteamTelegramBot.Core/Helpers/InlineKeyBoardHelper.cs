@@ -1,4 +1,5 @@
-﻿using SteamTelegramBot.Abstractions.Models;
+﻿using SteamTelegramBot.Abstractions;
+using SteamTelegramBot.Abstractions.Models.Applications;
 using SteamTelegramBot.Abstractions.Models.Callbacks;
 using SteamTelegramBot.Common.Enums;
 using SteamTelegramBot.Common.Extensions;
@@ -55,20 +56,21 @@ public static class InlineKeyBoardHelper
         return new InlineKeyboardMarkup(keyboardButtons);
     }
 
-    public static InlineKeyboardMarkup GetInlineKeyboardByAppAction(ICollection<TrackedAppItemDto> trackedApps, AppAction appAction)
+    public static InlineKeyboardMarkup GetPagedInlineKeyboardByAppAction(ICollection<TrackedAppItemDto> trackedApps, IPaged pageInfo, AppAction appAction)
     {
-        var keyboardButtons = trackedApps.Select(x => new[]
+        var applicationButtons = trackedApps.Select(x => new[]
         {
             appAction == AppAction.Remove
                 ? InlineKeyboardButton.WithCallbackData(
-                    text: x.Name,
-                    callbackData: new ChosenAppCallbackDto { Action = AppAction.Remove, AppId = x.Id }.Serialize())
-                : InlineKeyboardButton.WithUrl(text: $"{x.Index}. {x.Name}", url: x.Link),
-        });
+                    text: x.FormattedTitle,
+                    callbackData: new ChosenAppCallbackDto { Action = appAction, AppId = x.Id, Current = pageInfo.Current}.Serialize())
+                : InlineKeyboardButton.WithUrl(text: x.FormattedTitle, url: x.Link),
+        })
+            .Append(GetPagingButtons(pageInfo, appAction))
+            .Append(GetMainMenuButton())
+            ;
 
-        keyboardButtons = keyboardButtons.Append(GetMainMenuButton());
-
-        return new InlineKeyboardMarkup(keyboardButtons);
+        return new InlineKeyboardMarkup(applicationButtons);
     }
 
     private static InlineKeyboardButton[] GetMainMenuButton()
@@ -76,4 +78,50 @@ public static class InlineKeyBoardHelper
         {
             InlineKeyboardButton.WithCallbackData("Вернуться в главное меню", new MainMenuCallbackDto().Serialize())
         };
+
+    private static InlineKeyboardButton[] GetPagingButtons(IPaged pageInfo, AppAction appAction)
+    {
+        var callback = GetCallbackModelForAction(pageInfo, appAction);
+
+        var isFirstPage = pageInfo.Current == IPaged.DefaultPage;
+        var isLastPage = pageInfo.Current == pageInfo.Total;
+
+        var previousButtonText = isFirstPage ? "⛔️" : "⬅️";
+        callback.Current = isFirstPage ? pageInfo.Current : pageInfo.Current - 1;
+        callback.Ignore = isFirstPage;
+        var previousButton = InlineKeyboardButton.WithCallbackData(text: previousButtonText, callbackData: callback.Serialize());
+
+        var nextButtonText = isLastPage ? "⛔️" : "➡️";
+        callback.Current = isLastPage ? pageInfo.Current : pageInfo.Current + 1;
+        callback.Ignore = isLastPage;
+        var nextButton = InlineKeyboardButton.WithCallbackData(text: nextButtonText, callbackData: callback.Serialize());
+
+        var pageCountText = $"{pageInfo.Current} / {pageInfo.Total}";
+        callback.Current = pageInfo.Current;
+        callback.Ignore = true;
+        var pageCountButton = InlineKeyboardButton.WithCallbackData(text: pageCountText, callbackData: callback.Serialize());
+
+        return new[] { previousButton, pageCountButton, nextButton };
+    }
+
+    private static PagedCallbackDto GetCallbackModelForAction(IPaged pageInfo, AppAction appAction)
+    {
+        var result = new PagedCallbackDto();
+
+        switch (appAction)
+        {
+            case AppAction.Remove:
+                result = new RemoveAppCallbackDto();
+                break;
+
+            case AppAction.Add:
+            case AppAction.Get:
+                result = new TrackedAppsCallbackDto();
+                break;
+        }
+
+        result.Total = pageInfo.Total;
+        
+        return result;
+    }
 }

@@ -2,5 +2,5 @@
 
 public class BaseCallbackDto
 {
-    public virtual string CallbackName { get; init; }
+    public virtual string Name { get; init; }
 }

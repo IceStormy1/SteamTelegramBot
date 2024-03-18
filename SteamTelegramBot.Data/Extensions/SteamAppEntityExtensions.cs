@@ -1,5 +1,5 @@
 ﻿using SteamTelegramBot.Abstractions.Exceptions;
-using SteamTelegramBot.Abstractions.Models;
+using SteamTelegramBot.Abstractions.Models.Applications;
 using SteamTelegramBot.Common.Constants;
 using SteamTelegramBot.Data.Entities;
 

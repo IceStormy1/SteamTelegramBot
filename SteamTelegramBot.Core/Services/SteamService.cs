@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
 using SteamTelegramBot.Abstractions.Exceptions;
-using SteamTelegramBot.Abstractions.Models;
+using SteamTelegramBot.Abstractions.Models.Applications;
 using SteamTelegramBot.Clients;
 using SteamTelegramBot.Core.Interfaces;
 using SteamTelegramBot.Data.Entities;

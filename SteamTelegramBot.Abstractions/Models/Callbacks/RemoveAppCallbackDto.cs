@@ -2,7 +2,7 @@
 
 namespace SteamTelegramBot.Abstractions.Models.Callbacks;
 
-public sealed class RemoveAppCallbackDto : BaseCallbackDto
+public sealed class RemoveAppCallbackDto : PagedCallbackDto
 {
-    public override string CallbackName => TelegramConstants.RemoveAppCallback;
+    public override string Name => TelegramConstants.RemoveAppCallback;
 }

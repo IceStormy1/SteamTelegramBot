@@ -1,4 +1,5 @@
-﻿using SteamTelegramBot.Data.Entities;
+﻿using SteamTelegramBot.Abstractions.Models;
+using SteamTelegramBot.Data.Entities;
 
 namespace SteamTelegramBot.Data.Interfaces;
 
@@ -8,7 +9,10 @@ public interface IUserAppTrackingRepository : IBaseRepository<UserAppTrackingEnt
     /// Returns a list of applications that the user is tracking
     /// </summary>
     /// <param name="telegramUserId">User id in Telegram</param>
-    Task<List<SteamAppEntity>> GetTrackedApplicationsByTelegramId(long telegramUserId);
+    /// <param name="limit">Limit of applications</param>
+    /// <param name="offset">Offset</param>
+    Task<ListResponseDto<SteamAppEntity>> GetTrackedApplicationsByTelegramId(long telegramUserId, byte limit, int offset);
+
     Task<List<int>> GetTrackedSteamAppIds(short limit, int offset);
 
     /// <summary>

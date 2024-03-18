@@ -3,7 +3,7 @@ using SteamTelegramBot.Common.Extensions;
 using System.Globalization;
 using System.Text;
 
-namespace SteamTelegramBot.Abstractions.Models;
+namespace SteamTelegramBot.Abstractions.Models.Applications;
 
 public class SteamSuggestItem
 {
@@ -31,7 +31,7 @@ public class SteamSuggestItem
 
     public SteamSuggestItem()
     {
-        
+
     }
 
     public SteamSuggestItem(string listingData)

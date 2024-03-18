@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Quartz;
-using SteamTelegramBot.Abstractions.Models;
+using SteamTelegramBot.Abstractions.Models.Applications;
 using SteamTelegramBot.Core.Interfaces;
 
 namespace SteamTelegramBot.Jobs.Jobs;
@@ -11,7 +11,6 @@ internal class CheckingSteamAppsJob : IJob
 {
     private const string JobName = nameof(CheckingSteamAppsJob);
     private const byte MaxUpdatedApplications = 60;
-    private const byte MaxTrackedApplications = 30;
 
     private int _totalApplications;
     private int _totalUpdated;
@@ -84,7 +83,7 @@ internal class CheckingSteamAppsJob : IJob
         while (true)
         {
             var trackedApplicationIds = 
-                await _userAppTrackingService.GetUsersTrackedAppsIds(limit: MaxTrackedApplications, offset: updatedAppsIds.Count);
+                await _userAppTrackingService.GetUsersTrackedAppsIds(limit: MaxUpdatedApplications, offset: updatedAppsIds.Count);
 
             if (trackedApplicationIds.Count == default)
                 break;
@@ -92,10 +91,10 @@ internal class CheckingSteamAppsJob : IJob
             var trackedItems = allApplications.Where(x => trackedApplicationIds.Contains(x.AppId)).ToList();
             await AddOrUpdateSteamApplications(trackedItems);
 
-            await _telegramNotificationService.NotifyUsersOfPriceDrop(trackedApplicationIds);
-
             updatedAppsIds.AddRange(trackedApplicationIds);
         }
+
+        await _telegramNotificationService.NotifyUsersOfPriceDrop(updatedAppsIds);
 
         return updatedAppsIds;
     }

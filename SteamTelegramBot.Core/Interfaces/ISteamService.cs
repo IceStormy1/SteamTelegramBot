@@ -1,4 +1,4 @@
-﻿using SteamTelegramBot.Abstractions.Models;
+﻿using SteamTelegramBot.Abstractions.Models.Applications;
 
 namespace SteamTelegramBot.Core.Interfaces;
 

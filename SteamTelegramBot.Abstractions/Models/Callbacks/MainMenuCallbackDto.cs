@@ -4,5 +4,5 @@ namespace SteamTelegramBot.Abstractions.Models.Callbacks;
 
 public sealed class MainMenuCallbackDto : BaseCallbackDto
 {
-    public override string CallbackName => TelegramConstants.MainMenuCallback;
+    public override string Name => TelegramConstants.MainMenuCallback;
 }

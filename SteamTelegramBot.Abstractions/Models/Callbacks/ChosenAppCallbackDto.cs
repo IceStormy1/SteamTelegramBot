@@ -3,10 +3,10 @@ using SteamTelegramBot.Common.Enums;
 
 namespace SteamTelegramBot.Abstractions.Models.Callbacks;
 
-public sealed class ChosenAppCallbackDto : BaseCallbackDto
+public sealed class ChosenAppCallbackDto : PagedCallbackDto
 {
-    public override string CallbackName => TelegramConstants.ChosenAppCallback;
+    public override string Name => TelegramConstants.ChosenAppCallback;
 
-    public long AppId { get; set; }
+    public long? AppId { get; set; }
     public AppAction Action { get; init; }
 }

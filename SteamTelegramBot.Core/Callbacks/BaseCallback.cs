@@ -1,4 +1,5 @@
-﻿using SteamTelegramBot.Core.Interfaces;
+﻿using Newtonsoft.Json;
+using SteamTelegramBot.Core.Interfaces;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -21,6 +22,9 @@ internal abstract class BaseCallback
     }
 
     public abstract string Name { get; }
+
+    public static T GetCallbackData<T>(CallbackQuery callbackQuery)
+        => JsonConvert.DeserializeObject<T>(callbackQuery.Data ?? string.Empty);
 
     public abstract Task Execute(CallbackQuery callbackQuery, CancellationToken cancellationToken);
 }

@@ -101,7 +101,8 @@ internal sealed class TelegramHandleService : BaseService, ITelegramHandleServic
     private async Task ExecuteCallback(CallbackQuery callbackQuery, CancellationToken cancellationToken)
     {
         var callbackDto = JsonConvert.DeserializeObject<BaseCallbackDto>(callbackQuery.Data ?? string.Empty);
-        var callback = _callbacks.FirstOrDefault(x => x.Name == callbackDto?.CallbackName);
+
+        var callback = _callbacks.FirstOrDefault(x => x.Name == callbackDto?.Name);
 
         if (callback is null)
         {

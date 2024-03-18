@@ -6,6 +6,7 @@ public static class ObjectExtensions
 {
     public static string Serialize(this object obj)
     {
-        return JsonConvert.SerializeObject(obj ?? new object());
+        var settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling  = DefaultValueHandling.Ignore };
+        return JsonConvert.SerializeObject(obj ?? new object(), settings);
     }
 }

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using SteamTelegramBot.Abstractions.Models;
+using SteamTelegramBot.Abstractions.Models.Applications;
 using SteamTelegramBot.Clients.Models;
 using SteamTelegramBot.Data.Entities;
 

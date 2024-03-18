@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using SteamTelegramBot.Abstractions.Models;
 using SteamTelegramBot.Data.Entities;
 using SteamTelegramBot.Data.Interfaces;
 
@@ -11,12 +12,26 @@ internal sealed class UserAppTrackingRepository : BaseRepository<UserAppTracking
     {
     }
 
-    public Task<List<SteamAppEntity>> GetTrackedApplicationsByTelegramId(long telegramUserId)
-        => DbSet.AsNoTracking()
-            .Where(x => x.User.TelegramId == telegramUserId)
-            .OrderBy(x=>x.SteamApp.Title)
+    public async Task<ListResponseDto<SteamAppEntity>> GetTrackedApplicationsByTelegramId(long telegramUserId, byte limit,
+        int offset)
+    {
+        var query = DbSet.AsNoTracking()
+                .Where(x => x.User.TelegramId == telegramUserId);
+
+        var totalApps = await query.LongCountAsync();
+
+        if (totalApps == default)
+            return ListResponseDto<SteamAppEntity>.Empty;
+
+        var apps = await query
+            .OrderBy(x => x.SteamApp.Title)
+            .Skip(offset)
+            .Take(limit)
             .Select(x => x.SteamApp)
             .ToListAsync();
+
+        return new ListResponseDto<SteamAppEntity> { Items = apps, Total = totalApps };
+    }
 
     public Task<List<int>> GetTrackedSteamAppIds(short limit, int offset)
         => DbSet.AsNoTracking()

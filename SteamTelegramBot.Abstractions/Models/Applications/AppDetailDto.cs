@@ -1,4 +1,4 @@
-﻿namespace SteamTelegramBot.Abstractions.Models;
+﻿namespace SteamTelegramBot.Abstractions.Models.Applications;
 
 public sealed class AppDetailDto
 {

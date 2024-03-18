@@ -1,4 +1,4 @@
-﻿namespace SteamTelegramBot.Abstractions.Models;
+﻿namespace SteamTelegramBot.Abstractions.Models.Applications;
 
 public sealed class TrackedAppItemDto
 {
@@ -9,4 +9,6 @@ public sealed class TrackedAppItemDto
     public string Name { get; init; }
     public string Link { get; init; }
     public long Id { get; init; }
+
+    public string FormattedTitle => $"{Index}. {Name}";
 }

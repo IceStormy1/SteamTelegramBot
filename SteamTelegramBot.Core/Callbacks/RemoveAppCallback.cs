@@ -1,10 +1,9 @@
-﻿using SteamTelegramBot.Common.Constants;
+﻿using SteamTelegramBot.Abstractions.Models.Callbacks;
+using SteamTelegramBot.Common.Constants;
 using SteamTelegramBot.Common.Enums;
-using SteamTelegramBot.Core.Helpers;
 using SteamTelegramBot.Core.Interfaces;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 
 namespace SteamTelegramBot.Core.Callbacks;
 
@@ -21,14 +20,14 @@ internal sealed class RemoveAppCallback : BaseCallback
 
     public override async Task Execute(CallbackQuery callbackQuery, CancellationToken cancellationToken)
     {
-        var trackedApps = await UserAppTrackingService.GetAllUserTrackedApps(callbackQuery.From.Id);
+        var callbackData = GetCallbackData<TrackedAppsCallbackDto>(callbackQuery);
 
-        await BotClient.EditMessageTextAsync(
+        await TelegramNotificationService.SendTrackedApps(
             chatId: callbackQuery.Message!.Chat.Id,
             messageId: callbackQuery.Message.MessageId,
-            text: TelegramConstants.RemoveGameCallbackMessage,
-            replyMarkup: InlineKeyBoardHelper.GetInlineKeyboardByAppAction(trackedApps, AppAction.Remove),
-            parseMode: ParseMode.MarkdownV2,
+            telegramUserId: callbackQuery.From.Id,
+            pageInfo: callbackData,
+            action: AppAction.Remove,
             cancellationToken: cancellationToken);
     }
 }
