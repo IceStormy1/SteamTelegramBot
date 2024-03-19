@@ -42,7 +42,7 @@ public class ConfigureWebhook : IHostedService
             scope: BotCommandScope.AllPrivateChats(),
             commands: new List<BotCommand>
             {
-                new() { Command = TelegramCommands.StartCommand, Description = "Старт" },
+                new() { Command = TelegramCommands.StartCommand, Description = "Перезапустить бота" },
                 new() { Command = TelegramCommands.AddGameCommand, Description = "Добавить игру для отслеживания цены" }
             });
 

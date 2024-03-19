@@ -3,5 +3,5 @@
 public static class TelegramCommands
 {
     public const string StartCommand = "/start";
-    public const string AddGameCommand = "/addgame";
+    public const string AddGameCommand = "/add";
 }
