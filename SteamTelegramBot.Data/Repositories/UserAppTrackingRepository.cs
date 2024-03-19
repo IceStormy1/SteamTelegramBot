@@ -18,7 +18,7 @@ internal sealed class UserAppTrackingRepository : BaseRepository<UserAppTracking
         var query = DbSet.AsNoTracking()
                 .Where(x => x.User.TelegramId == telegramUserId);
 
-        var totalApps = await query.LongCountAsync();
+        var totalApps = await query.CountAsync();
 
         if (totalApps == default)
             return ListResponseDto<SteamAppEntity>.Empty;

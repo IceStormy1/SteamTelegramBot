@@ -2,9 +2,9 @@
 
 public sealed class ListResponseDto<TItem>
 {
-    public long Total { get; init; }
+    public int Total { get; set; }
 
-    public List<TItem> Items { get; init; }
+    public List<TItem> Items { get; set; } = new();
 
     public static ListResponseDto<TItem> Empty => new();
 }

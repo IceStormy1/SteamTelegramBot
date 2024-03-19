@@ -11,35 +11,14 @@ public static class InlineKeyBoardHelper
 {
     public static InlineKeyboardMarkup GetInlineKeyboardByType(InlineKeyBoardType type)
     {
-        List<IEnumerable<InlineKeyboardButton>> inlineKeyBoardButtons;
-        switch (type)
+        var inlineKeyBoardButtons = type switch
         {
-            case InlineKeyBoardType.Start:
-                inlineKeyBoardButtons = new List<IEnumerable<InlineKeyboardButton>>
-                {
-                    new[]
-                    {
-                        InlineKeyboardButton.WithCallbackData("Добавить игру в список", new AddAppCallbackDto().Serialize()),
-                        InlineKeyboardButton.WithCallbackData("Удалить игру из списка", new RemoveAppCallbackDto().Serialize()),
-                    },
-                    new[]
-                    {
-                        InlineKeyboardButton.WithCallbackData("Список отслеживаемых игр", new TrackedAppsCallbackDto().Serialize())
-                    }
-                };
+            InlineKeyBoardType.Start => GetMainMenuButtons(),
+            InlineKeyBoardType.BackToMainMenu or InlineKeyBoardType.AddGame => new List<IEnumerable<InlineKeyboardButton>> { GetBackMainMenuButton() },
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+        };
 
-                return new InlineKeyboardMarkup(inlineKeyBoardButtons);
-
-            case InlineKeyBoardType.AddGame:
-                inlineKeyBoardButtons = new List<IEnumerable<InlineKeyboardButton>>
-                {
-                    GetMainMenuButton()
-                };
-
-                return new InlineKeyboardMarkup(inlineKeyBoardButtons);
-            default:
-                throw new ArgumentOutOfRangeException(nameof(type), type, null);
-        }
+        return new InlineKeyboardMarkup(inlineKeyBoardButtons);
     }
 
     public static InlineKeyboardMarkup GetAddGameInlineKeyboard(IReadOnlyCollection<SteamSuggestItem> steamSuggestItems)
@@ -51,7 +30,7 @@ public static class InlineKeyBoardHelper
                 callbackData: new ChosenAppCallbackDto { Action = AppAction.Add, AppId = x.AppId }.Serialize()),
         });
 
-        keyboardButtons = keyboardButtons.Append(GetMainMenuButton());
+        keyboardButtons = keyboardButtons.Append(GetBackMainMenuButton());
 
         return new InlineKeyboardMarkup(keyboardButtons);
     }
@@ -67,13 +46,30 @@ public static class InlineKeyBoardHelper
                 : InlineKeyboardButton.WithUrl(text: x.FormattedTitle, url: x.Link),
         })
             .Append(GetPagingButtons(pageInfo, appAction))
-            .Append(GetMainMenuButton())
+            .Append(GetBackMainMenuButton())
             ;
 
         return new InlineKeyboardMarkup(applicationButtons);
     }
 
-    private static InlineKeyboardButton[] GetMainMenuButton()
+    private static List<IEnumerable<InlineKeyboardButton>> GetMainMenuButtons()
+        => new()
+        {
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("Добавить игру в список",
+                    new AddAppCallbackDto().Serialize()),
+                InlineKeyboardButton.WithCallbackData("Удалить игру из списка",
+                    new RemoveAppCallbackDto().Serialize()),
+            },
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("Список отслеживаемых игр",
+                    new TrackedAppsCallbackDto().Serialize())
+            }
+        };
+
+    private static InlineKeyboardButton[] GetBackMainMenuButton()
         => new[]
         {
             InlineKeyboardButton.WithCallbackData("Вернуться в главное меню", new MainMenuCallbackDto().Serialize())

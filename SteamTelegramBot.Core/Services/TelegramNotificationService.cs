@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
 using SteamTelegramBot.Abstractions;
+using SteamTelegramBot.Abstractions.Models;
+using SteamTelegramBot.Abstractions.Models.Applications;
 using SteamTelegramBot.Common.Constants;
 using SteamTelegramBot.Common.Enums;
 using SteamTelegramBot.Common.Extensions;
@@ -12,6 +14,7 @@ using SteamTelegramBot.Data.Interfaces;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace SteamTelegramBot.Core.Services;
 
@@ -93,27 +96,62 @@ internal sealed class TelegramNotificationService : BaseService, ITelegramNotifi
             disableNotification: true);
     }
 
-    public async Task SendTrackedApps(long chatId, int messageId, long telegramUserId, IPaged pageInfo, AppAction action, CancellationToken cancellationToken)
+    public async Task SendTrackedApps(
+        long chatId, 
+        int messageId,
+        long telegramUserId,
+        IPaged pageInfo,
+        AppAction action, 
+        CancellationToken cancellationToken)
     {
         if (pageInfo.Ignore.HasValue && pageInfo.Ignore.Value)
             return;
 
-        var text = action == AppAction.Remove
-            ? TelegramConstants.RemoveGameCallbackMessage
-            : "Список отслеживаемых игр:";
+        var trackedApps = await GetUserTrackedAppsAsync(telegramUserId, pageInfo);
 
-        var trackedApps = await _userAppTrackingService.GetUserTrackedApps(
-            telegramUserId: telegramUserId, 
+        await UpdatePageInfoIfNeeded(telegramUserId, pageInfo, trackedApps);
+
+        var text = GenerateMessageText(action, trackedApps, pageInfo);
+
+        var replyMarkup = GenerateReplyMarkup(trackedApps, pageInfo, action);
+
+        await SendMessageAsync(chatId, messageId, text, pageInfo.Current, replyMarkup, cancellationToken);
+    }
+
+    private Task<ListResponseDto<TrackedAppItemDto>> GetUserTrackedAppsAsync(long telegramUserId, IPaged pageInfo)
+        => _userAppTrackingService.GetUserTrackedApps(
+            telegramUserId: telegramUserId,
             limit: pageInfo.Size,
             offset: (pageInfo.Current - 1) * pageInfo.Size);
-        
-        // TODO: Баг при удалении последнего приложения со страницы
-        // TODO: Отправлять "пусто", если приложений нет и это первая страница
 
-        pageInfo.Total = (int)Math.Ceiling((double)trackedApps.Total / (double)pageInfo.Size);
-        var replyMarkup = InlineKeyBoardHelper.GetPagedInlineKeyboardByAppAction(trackedApps.Items, pageInfo, action);
+    private async Task UpdatePageInfoIfNeeded(long telegramUserId, IPaged pageInfo, ListResponseDto<TrackedAppItemDto> trackedApps)
+    {
+        pageInfo.Total = (trackedApps.Total + pageInfo.Size - 1) / pageInfo.Size;
+        if (pageInfo.Current > pageInfo.Total)
+        {
+            pageInfo.Current = pageInfo.Total;
+            trackedApps.Items = (await GetUserTrackedAppsAsync(telegramUserId, pageInfo)).Items;
+        }
+    }
 
-        if (pageInfo.Current == IPaged.DefaultPage)
+    private static string GenerateMessageText(AppAction action, ListResponseDto<TrackedAppItemDto> trackedApps, IPaged pageInfo)
+    {
+        if (pageInfo.Total == default)
+            return "Пусто";
+
+        return action == AppAction.Remove
+            ? TelegramConstants.RemoveGameCallbackMessage
+            : "Список отслеживаемых игр:";
+    }
+
+    private static InlineKeyboardMarkup GenerateReplyMarkup(ListResponseDto<TrackedAppItemDto> trackedApps, IPaged pageInfo, AppAction action)
+        => pageInfo.Total == default
+            ? InlineKeyBoardHelper.GetInlineKeyboardByType(InlineKeyBoardType.BackToMainMenu)
+            : InlineKeyBoardHelper.GetPagedInlineKeyboardByAppAction(trackedApps.Items, pageInfo, action);
+
+    private async Task SendMessageAsync(long chatId, int messageId, string text, int currentPage, InlineKeyboardMarkup replyMarkup, CancellationToken cancellationToken)
+    {
+        if (currentPage <= IPaged.DefaultPage)
         {
             await _botClient.EditMessageTextAsync(
                 chatId,
