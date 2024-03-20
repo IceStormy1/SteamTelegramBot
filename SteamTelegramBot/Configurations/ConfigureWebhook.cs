@@ -55,7 +55,8 @@ public class ConfigureWebhook : IHostedService
             });
 
         await botClient.SetMyDescriptionAsync(TelegramMessages.BotDescription, cancellationToken: cancellationToken);
-        await botClient.SetMyShortDescriptionAsync($"По всем вопросам обращаться к @{_botConfig.OwnerUsername}", cancellationToken: cancellationToken);
+        await botClient.SetMyShortDescriptionAsync("Телеграм бот для отслеживания цен на игры в Steam. " +
+                                                   $"По всем вопросам обращаться к @{_botConfig.OwnerUsername}", cancellationToken: cancellationToken);
         
         _logger.LogInformation("Setting webhook was complete");
     }
