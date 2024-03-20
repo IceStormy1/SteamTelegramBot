@@ -23,8 +23,8 @@ internal abstract class BaseCallback
 
     public abstract string Name { get; }
 
+    public abstract Task Execute(CallbackQuery callbackQuery, CancellationToken cancellationToken);
+
     public static T GetCallbackData<T>(CallbackQuery callbackQuery)
         => JsonConvert.DeserializeObject<T>(callbackQuery.Data ?? string.Empty);
-
-    public abstract Task Execute(CallbackQuery callbackQuery, CancellationToken cancellationToken);
 }

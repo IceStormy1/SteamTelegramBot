@@ -45,7 +45,7 @@ public class ConfigureWebhook : IHostedService
                 new() { Command = TelegramCommands.AddGameCommand, Description = "Добавить игру для отслеживания цены" }
             });
 
-        await botClient.SetMyDescriptionAsync(TelegramConstants.BotDescription, cancellationToken: cancellationToken);
+        await botClient.SetMyDescriptionAsync(TelegramMessages.BotDescription, cancellationToken: cancellationToken);
         await botClient.SetMyShortDescriptionAsync($"По всем вопросам обращаться к @{_botConfig.OwnerUsername}", cancellationToken: cancellationToken);
         
         _logger.LogInformation("Setting webhook was complete");

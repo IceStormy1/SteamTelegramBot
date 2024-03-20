@@ -140,7 +140,7 @@ internal sealed class TelegramNotificationService : BaseService, ITelegramNotifi
             return "Пусто";
 
         return action == AppAction.Remove
-            ? TelegramConstants.RemoveGameCallbackMessage
+            ? TelegramMessages.RemoveGameCallbackMessage
             : "Список отслеживаемых игр:";
     }
 

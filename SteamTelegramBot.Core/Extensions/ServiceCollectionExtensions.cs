@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SteamTelegramBot.Common.Extensions;
 using SteamTelegramBot.Core.Callbacks;
+using SteamTelegramBot.Core.Commands;
 using SteamTelegramBot.Core.Services;
 
 namespace SteamTelegramBot.Core.Extensions;
@@ -9,6 +10,7 @@ public static class ServiceCollectionExtensions
 {
     private const string ServiceSuffix = "Service";
     private const string CallbackSuffix = "Callback";
+    private const string CommandSuffix = "Command";
 
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
@@ -19,16 +21,21 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection RegisterCallbacks(this IServiceCollection services)
+    public static IServiceCollection RegisterCallbacks(this IServiceCollection services) 
+        => services.RegisterTypesWithBase<BaseCallback>(CallbackSuffix);
+
+    public static IServiceCollection RegisterCommands(this IServiceCollection services)
+        => services.RegisterTypesWithBase<BaseCommand>(CommandSuffix);
+
+    private static IServiceCollection RegisterTypesWithBase<TBase>(this IServiceCollection services, string suffix)
     {
-        var baseCallbackType = typeof(BaseCallback);
-        var callbackTypes = GetAllTypes(baseCallbackType, CallbackSuffix);
+        var baseType = typeof(TBase);
 
-        foreach (var callbackType in callbackTypes)
-        {
-            services.AddScoped(baseCallbackType, callbackType);
-        }
+        var commandTypes = GetAllTypes(baseType, suffix);
 
+        foreach (var callbackType in commandTypes)
+            services.AddScoped(baseType, callbackType);
+        
         return services;
     }
 

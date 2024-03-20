@@ -24,7 +24,7 @@ internal sealed class AddAppCallback : BaseCallback
         => BotClient.EditMessageTextAsync(
             chatId: callbackQuery.Message!.Chat.Id,
             messageId: callbackQuery.Message.MessageId,
-            text: TelegramConstants.AddGameCallbackMessage,
+            text: TelegramMessages.AddGameCallbackMessage,
             replyMarkup: InlineKeyBoardHelper.GetInlineKeyboardByType(InlineKeyBoardType.AddGame),
             parseMode: ParseMode.MarkdownV2,
             cancellationToken: cancellationToken);

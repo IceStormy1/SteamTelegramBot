@@ -22,6 +22,7 @@ builder.Services
     .AddDbContext(builder.Configuration, enableSensitiveData: builder.Environment.IsDevelopment())
     .AddServices()
     .RegisterCallbacks()
+    .RegisterCommands()
     .AddRepositories()
     .AddRouting(c => c.LowercaseUrls = true)
     .AddAutoMapper(x => x.AddMaps(typeof(AbstractProfile).Assembly))

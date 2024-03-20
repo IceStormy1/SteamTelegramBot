@@ -1,6 +1,6 @@
 ﻿namespace SteamTelegramBot.Common.Constants;
 
-public static class TelegramConstants
+public static class TelegramMessages
 {
     public const string StartMessage = "Привет! 👋\n" +
                                        "Я помогу вам следить за ценами на игры в Steam и уведомлю, когда цена вашей любимой игры упадёт 🎮\n\n" +
