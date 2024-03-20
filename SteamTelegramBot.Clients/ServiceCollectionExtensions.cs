@@ -8,7 +8,7 @@ using Telegram.Bot;
 namespace SteamTelegramBot.Clients;
 
 /// <summary>
-/// Региструет клиенты
+/// Register clients
 /// </summary>
 public static class ServiceCollectionExtensions
 {
@@ -16,11 +16,11 @@ public static class ServiceCollectionExtensions
     private const string TelegramClientName = "SteamTelegramBot.TelegramBotClient";
 
     /// <summary>
-    /// Регистрирует все клиенты в контейнере зависимостей
+    /// Registers all clients in the dependency container
     /// </summary>
-    /// <param name="services">Контейнер зависимостей.</param>
+    /// <param name="services">Dependency container</param>
     /// <param name="configuration"></param>
-    /// <param name="baseAddress">Базовый адрес для вызовов.</param>
+    /// <param name="baseAddress">Base url for requests.</param>
     /// <param name="clientConfigure"></param>
     public static IServiceCollection AddClients(
         this IServiceCollection services,
@@ -37,10 +37,10 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Регистрирует все клиенты в контейнере зависимостей.
+    /// Registers all clients in the dependency container
     /// </summary>
-    /// <param name="services">Контейнер зависимостей.</param>
-    /// <param name="baseAddress">Базовый адрес для вызовов.</param>
+    /// <param name="services">Dependency container</param>
+    /// <param name="baseAddress">Base url for requests</param>
     /// <param name="clientConfigure"></param>
     private static IServiceCollection AddClients(
         this IServiceCollection services, 
@@ -88,6 +88,12 @@ public static class ServiceCollectionExtensions
         });
     }
 
+    /// <summary>
+    /// Add telegram client for requests to the telegram api 
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="botToken">Token from the bot</param>
+    /// <returns></returns>
     private static IServiceCollection AddTelegramClient(this IServiceCollection services, string botToken)
     {
         services.AddHttpClient(TelegramClientName)

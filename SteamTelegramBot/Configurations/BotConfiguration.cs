@@ -1,5 +1,8 @@
 ﻿namespace SteamTelegramBot.Configurations;
 
+/// <summary>
+/// Configuration for telegram bot
+/// </summary>
 public sealed class BotConfiguration
 {
     /// <summary>

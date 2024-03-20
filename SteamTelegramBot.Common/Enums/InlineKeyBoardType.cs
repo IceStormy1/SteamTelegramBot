@@ -1,5 +1,8 @@
 ﻿namespace SteamTelegramBot.Common.Enums;
 
+/// <summary>
+/// Types for telegram inline key board
+/// </summary>
 public enum InlineKeyBoardType
 {
     Start = 1,

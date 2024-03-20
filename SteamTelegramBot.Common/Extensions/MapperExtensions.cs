@@ -5,15 +5,15 @@ namespace SteamTelegramBot.Common.Extensions;
 public static class MapperExtensions
 {
     /// <summary>
-    /// Маппит коллекцию на другую поэлементно. Учитываются существующие элементы в <typeparamref name="TTarget"/>
+    /// Provides extension methods for mapping collections using AutoMapper.
     /// </summary>
-    /// <param name="mapper"></param>
-    /// <param name="source">Источник</param>
-    /// <param name="target">Конечный список</param>
-    /// <param name="find">Поиск источника в конечном списке</param>
-    /// <param name="map">Функция определяемого пользователем маппинга</param>
-    /// <typeparam name="TSource"></typeparam>
-    /// <typeparam name="TTarget"></typeparam>
+    /// <typeparam name="TSource">The type of the source objects.</typeparam>
+    /// <typeparam name="TTarget">The type of the target objects.</typeparam>
+    /// <param name="mapper">The IMapper instance used for mapping.</param>
+    /// <param name="source">The collection of source objects to map.</param>
+    /// <param name="target">The list of target objects to populate.</param>
+    /// <param name="find">A function to find the target object corresponding to a source object.</param>
+    /// <param name="map">An optional mapping function for additional customization.</param>
     public static void MapCollection<TSource, TTarget>(
         this IMapper mapper,
         IReadOnlyCollection<TSource> source,

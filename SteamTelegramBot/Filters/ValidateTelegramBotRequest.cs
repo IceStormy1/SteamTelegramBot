@@ -13,6 +13,7 @@ namespace SteamTelegramBot.Filters;
 [AttributeUsage(AttributeTargets.Method)]
 public sealed class ValidateTelegramBot : TypeFilterAttribute
 {
+    /// <inheritdoc cref="ValidateTelegramBot"/>
     public ValidateTelegramBot()
         : base(typeof(ValidateTelegramBotFilter))
     {

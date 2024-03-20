@@ -33,8 +33,6 @@ internal sealed class UserService : BaseService, IUserService
         }
         else
         {
-            userEntity.TelegramId = userEntity.Id;
-            userEntity.TelegramChatId = chatId;
             await _userRepository.UpdateUser(telegramUser, userEntity, chatId);
         }
     }

@@ -2,6 +2,9 @@
 
 namespace SteamTelegramBot.Abstractions.Models.Callbacks;
 
+/// <summary>
+/// Dto for paging 
+/// </summary>
 public class PagedCallbackDto : BaseCallbackDto, IPaged
 {
     [JsonIgnore]

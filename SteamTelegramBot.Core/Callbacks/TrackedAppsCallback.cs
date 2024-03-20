@@ -7,6 +7,9 @@ using Telegram.Bot.Types;
 
 namespace SteamTelegramBot.Core.Callbacks;
 
+/// <summary>
+/// Callback when the user chooses to get a list of tracked applications
+/// </summary>
 internal sealed class TrackedAppsCallback : BaseCallback
 {
     public TrackedAppsCallback(

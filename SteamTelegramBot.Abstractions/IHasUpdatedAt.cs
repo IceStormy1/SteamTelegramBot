@@ -1,12 +1,12 @@
 ﻿namespace SteamTelegramBot.Abstractions;
 
 /// <summary>
-/// Интерфейс, представляющий сущность, у которой есть дата и время обновления.
+/// Represents an entity that has an update date and time.
 /// </summary>
 public interface IHasUpdatedAt
 {
     /// <summary>
-    /// Дата и время изменения сущености
+    /// Date and time of the entity change
     /// </summary>
     public DateTime? UpdatedAt { get; set; }
 }

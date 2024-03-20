@@ -5,6 +5,9 @@ using Telegram.Bot.Types;
 
 namespace SteamTelegramBot.Core.Commands;
 
+/// <summary>
+/// Represents a command for starting interaction with a Telegram bot.
+/// </summary>
 internal sealed class StartCommand : BaseCommand
 {
     private readonly ITelegramNotificationService _telegramNotificationService;

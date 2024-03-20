@@ -6,8 +6,13 @@ namespace SteamTelegramBot.Jobs.Extensions;
 public static class ServiceCollectionQuartzConfiguratorExtensions
 {
     /// <summary>
-    /// Add a job and trigger
+    /// Adds a job and trigger based on the specified job type and configuration.
     /// </summary>
+    /// <typeparam name="T">The type of job to add.</typeparam>
+    /// <param name="quartz">The Quartz configurator.</param>
+    /// <param name="config">The configuration containing the job schedule.</param>
+    /// <exception cref="InvalidOperationException">Thrown when unable to determine job name.</exception>
+    /// <exception cref="ArgumentException">Thrown when no Quartz.NET Cron schedule found for job in configuration.</exception>
     public static void AddJobAndTrigger<T>(
         this IServiceCollectionQuartzConfigurator quartz,
         IConfiguration config)

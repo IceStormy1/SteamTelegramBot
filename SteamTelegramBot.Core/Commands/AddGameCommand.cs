@@ -4,10 +4,12 @@ using SteamTelegramBot.Core.Interfaces;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace SteamTelegramBot.Core.Commands;
 
+/// <summary>
+/// Represents a command for adding a game
+/// </summary>
 internal sealed class AddGameCommand : BaseCommand
 {
     private readonly ISteamService _steamService;

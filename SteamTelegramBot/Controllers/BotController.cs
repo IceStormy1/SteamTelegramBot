@@ -7,6 +7,9 @@ using Telegram.Bot.Types;
 
 namespace SteamTelegramBot.Controllers;
 
+/// <summary>
+/// Telegram bot controller
+/// </summary>
 [ApiController]
 [Route("[controller]")]
 public class BotController : ControllerBase
@@ -15,6 +18,7 @@ public class BotController : ControllerBase
     private readonly ITelegramHandleService _telegramService;
     private readonly ISteamWebApiClient _webApiClient;
 
+    /// <inheritdoc cref="BotController"/>
     public BotController(
         ILogger<BotController> logger,
         ITelegramHandleService telegramService, 
@@ -26,14 +30,11 @@ public class BotController : ControllerBase
         _webApiClient = webApiClient;
     }
 
-    [HttpGet("test")]
-    public async Task<List<AppItem>> Test()
-    {
-        var test2 = (await _webApiClient.GetAllApps()).Content?.AppList?.Apps?.Where(x => !string.IsNullOrWhiteSpace(x.Name)).ToList();
-
-        return test2;
-    }
-
+    /// <summary>
+    /// Telegram request
+    /// </summary>
+    /// <param name="update"></param>
+    /// <param name="cancellationToken"></param>
     [HttpPost]
     [ValidateTelegramBot]
     public async Task<IActionResult> Update(

@@ -7,8 +7,16 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace SteamTelegramBot.Core.Helpers;
 
+/// <summary>
+/// Provides helper methods for creating inline keyboards for Telegram bot interactions.
+/// </summary>
 public static class InlineKeyBoardHelper
 {
+    /// <summary>
+    /// Gets an inline keyboard markup based on the specified inline keyboard type.
+    /// </summary>
+    /// <param name="type">The type of inline keyboard.</param>
+    /// <returns>An inline keyboard markup.</returns>
     public static InlineKeyboardMarkup GetInlineKeyboardByType(InlineKeyBoardType type)
     {
         var inlineKeyBoardButtons = type switch
@@ -21,6 +29,11 @@ public static class InlineKeyBoardHelper
         return new InlineKeyboardMarkup(inlineKeyBoardButtons);
     }
 
+    /// <summary>
+    /// Gets an inline keyboard markup for adding an application, based on Steam suggest items.
+    /// </summary>
+    /// <param name="steamSuggestItems">The collection of Steam suggest items.</param>
+    /// <returns>An inline keyboard markup for adding a game.</returns>
     public static InlineKeyboardMarkup GetAddGameInlineKeyboard(IReadOnlyCollection<SteamSuggestItem> steamSuggestItems)
     {
         var keyboardButtons = steamSuggestItems.Select(x => new[]
@@ -35,6 +48,13 @@ public static class InlineKeyBoardHelper
         return new InlineKeyboardMarkup(keyboardButtons);
     }
 
+    /// <summary>
+    /// Gets an inline keyboard markup for paging by application action.
+    /// </summary>
+    /// <param name="trackedApps">The collection of tracked application items.</param>
+    /// <param name="pageInfo">The paging information.</param>
+    /// <param name="appAction">The application action.</param>
+    /// <returns>An inline keyboard markup for paging by application action.</returns>
     public static InlineKeyboardMarkup GetPagedInlineKeyboardByAppAction(ICollection<TrackedAppItemDto> trackedApps, IPaged pageInfo, AppAction appAction)
     {
         var applicationButtons = trackedApps.Select(x => new[]

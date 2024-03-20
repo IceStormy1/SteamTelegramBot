@@ -12,11 +12,15 @@ public sealed class UserAppTrackingEntity : BaseEntity, IHasCreatedAt
     /// <inheritdoc cref="UserEntity"/>
     public UserEntity User { get; set; }
 
+    /// <summary>
+    /// Steam application id
+    /// </summary>
     public long SteamAppId { get; set; }
 
     /// <inheritdoc cref="SteamAppEntity"/>
     public SteamAppEntity SteamApp { get; set; }
 
+    /// <inheritdoc cref="IHasCreatedAt.CreatedAt"/>
     public DateTime CreatedAt { get; set; }
 
     public List<TelegramNotificationEntity> TelegramNotifications { get; set; } = new();

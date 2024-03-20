@@ -5,6 +5,9 @@ using System.Text;
 
 namespace SteamTelegramBot.Abstractions.Models.Applications;
 
+/// <summary>
+/// Application from steam suggest
+/// </summary>
 public class SteamSuggestItem
 {
     private const string CurrencySplitSymbol = "pуб.";
@@ -22,11 +25,34 @@ public class SteamSuggestItem
 
     private const byte ImageStartIndex = 4;
 
+    /// <summary>
+    /// Application name from suggest
+    /// </summary>
     public string Name { get; init; }
+
+    /// <summary>
+    /// Link to the page in the store
+    /// </summary>
     public string StoreLink { get; init; }
+
+    /// <summary>
+    /// Link to the app image in the store
+    /// </summary>
     public string ImageLink { get; init; }
+
+    /// <summary>
+    /// Application price
+    /// </summary>
     public decimal? Price { get; init; }
+
+    /// <summary>
+    /// Type 
+    /// </summary>
     public PriceType PriceType { get; init; }
+
+    /// <summary>
+    /// Application ID
+    /// </summary>
     public int AppId { get; init; }
 
     public SteamSuggestItem()

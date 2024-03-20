@@ -12,6 +12,11 @@ public static class ServiceCollectionExtensions
     private const string CallbackSuffix = "Callback";
     private const string CommandSuffix = "Command";
 
+    /// <summary>
+    /// Register all services
+    /// </summary>
+    /// <param name="services"></param>
+    /// <returns></returns>
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
         var serviceTypes = GetAllTypes(typeof(BaseService), ServiceSuffix);
@@ -21,9 +26,19 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>
+    /// Register all callbacks
+    /// </summary>
+    /// <param name="services"></param>
+    /// <returns></returns>
     public static IServiceCollection RegisterCallbacks(this IServiceCollection services) 
         => services.RegisterTypesWithBase<BaseCallback>(CallbackSuffix);
 
+    /// <summary>
+    /// Register all commands
+    /// </summary>
+    /// <param name="services"></param>
+    /// <returns></returns>
     public static IServiceCollection RegisterCommands(this IServiceCollection services)
         => services.RegisterTypesWithBase<BaseCommand>(CommandSuffix);
 

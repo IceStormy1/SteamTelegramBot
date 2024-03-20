@@ -20,5 +20,7 @@ internal sealed class UserRepository : BaseRepository<UserEntity>, IUserReposito
         Mapper.Map(telegramUser, userEntity);
         userEntity.TelegramId = userEntity.Id;
         userEntity.TelegramChatId = chatId;
+
+        await DbContext.SaveChangesAsync();
     }
 }

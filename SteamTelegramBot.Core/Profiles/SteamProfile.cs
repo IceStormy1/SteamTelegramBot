@@ -5,6 +5,9 @@ using SteamTelegramBot.Data.Entities;
 
 namespace SteamTelegramBot.Core.Profiles;
 
+/// <summary>
+/// Represents a profile for mapping Steam models.
+/// </summary>
 internal sealed class SteamProfile : Profile
 {
     public SteamProfile()

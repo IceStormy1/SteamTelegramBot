@@ -5,6 +5,9 @@ using Telegram.Bot.Types;
 
 namespace SteamTelegramBot.Core.Callbacks;
 
+/// <summary>
+/// Callback for sent main menu
+/// </summary>
 internal sealed class MainMenuCallback : BaseCallback
 {
     public MainMenuCallback(

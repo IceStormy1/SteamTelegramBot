@@ -1,12 +1,12 @@
 ﻿namespace SteamTelegramBot.Abstractions;
 
 /// <summary>
-/// Интерфейс, представляющий сущность, у которой есть дата и время создания.
+/// Represents an entity that has a date and time of creation.
 /// </summary>
 public interface IHasCreatedAt
 {
     /// <summary>
-    /// Дата и время создания сущности
+    /// Date and time the entity was created
     /// </summary>
     public DateTime CreatedAt { get; set; }
 }

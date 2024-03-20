@@ -4,6 +4,9 @@ using Telegram.Bot.Types;
 
 namespace SteamTelegramBot.Core.Profiles;
 
+/// <summary>
+/// Represents a profile for mapping User models.
+/// </summary>
 internal sealed class UserProfile : Profile
 {
     public UserProfile()

@@ -1,5 +1,8 @@
 ﻿namespace SteamTelegramBot.Common.Constants;
 
+/// <summary>
+/// Provides callback constants for Telegram bot interactions
+/// </summary>
 public static class TelegramCallbacks
 {
     public const string AddAppCallback = "add_app";

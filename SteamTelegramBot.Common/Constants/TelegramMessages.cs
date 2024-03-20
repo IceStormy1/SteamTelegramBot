@@ -1,5 +1,8 @@
 ﻿namespace SteamTelegramBot.Common.Constants;
 
+/// <summary>
+/// Provides message constants for Telegram bot interactions.
+/// </summary>
 public static class TelegramMessages
 {
     public const string StartMessage = "Привет! 👋\n" +

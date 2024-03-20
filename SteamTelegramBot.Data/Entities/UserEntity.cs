@@ -2,6 +2,9 @@
 
 namespace SteamTelegramBot.Data.Entities;
 
+/// <summary>
+/// Entity for a user.
+/// </summary>
 public sealed class UserEntity : BaseEntity, IHasCreatedAt, IHasUpdatedAt
 {
     public string FirstName { get; set; }

@@ -7,6 +7,9 @@ using Telegram.Bot.Types;
 
 namespace SteamTelegramBot.Core.Callbacks;
 
+/// <summary>
+/// Callback when the user chooses to delete applications
+/// </summary>
 internal sealed class RemoveAppCallback : BaseCallback
 {
     public RemoveAppCallback(

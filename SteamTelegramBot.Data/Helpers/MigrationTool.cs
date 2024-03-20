@@ -4,6 +4,9 @@ using Microsoft.Extensions.Logging;
 
 namespace SteamTelegramBot.Data.Helpers;
 
+/// <summary>
+/// Represents a migration tool for applying database migrations.
+/// </summary>
 public sealed class MigrationTool
 {
     private readonly IServiceProvider _rootServiceProvider;
@@ -15,9 +18,16 @@ public sealed class MigrationTool
         _logger = rootServiceProvider.GetRequiredService<ILogger<MigrationTool>>();
     }
 
+    /// <summary>
+    /// Executes the migration process using the specified service provider.
+    /// </summary>
+    /// <param name="serviceProvider">The service provider.</param>
     public static void Execute(IServiceProvider serviceProvider)
         => new MigrationTool(serviceProvider).Migrate();
 
+    /// <summary>
+    /// Performs the migration process.
+    /// </summary>
     private void Migrate()
     {
         _logger.LogInformation("Creating scope...");

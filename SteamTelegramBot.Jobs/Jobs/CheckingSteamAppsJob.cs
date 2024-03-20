@@ -6,6 +6,9 @@ using SteamTelegramBot.Core.Interfaces;
 
 namespace SteamTelegramBot.Jobs.Jobs;
 
+/// <summary>
+/// Represents a Quartz job for checking and updating Steam applications.
+/// </summary>
 [DisallowConcurrentExecution]
 internal class CheckingSteamAppsJob : IJob
 {
@@ -38,6 +41,9 @@ internal class CheckingSteamAppsJob : IJob
         _userAppTrackingService = userAppTrackingService;
     }
 
+    /// <summary>
+    /// Executes the Steam applications update job.
+    /// </summary>
     public async Task Execute(IJobExecutionContext context)
     {
         _logger.LogInformation("{ScheduleJob} - Start of the Steam applications update", JobName);
@@ -58,6 +64,9 @@ internal class CheckingSteamAppsJob : IJob
             _totalApplicationsNotFound);
     }
 
+    /// <summary>
+    /// Updates the tracked applications.
+    /// </summary>
     private async Task UpdateApplications(IReadOnlyCollection<AppItemDto> allApplications)
     {
         var updatedAppsIds = await UpdateTrackedApplications(allApplications);
@@ -76,6 +85,9 @@ internal class CheckingSteamAppsJob : IJob
         }
     }
 
+    /// <summary>
+    /// Updates the tracked applications.
+    /// </summary>
     private async Task<List<int>> UpdateTrackedApplications(IReadOnlyCollection<AppItemDto> allApplications)
     {
         var updatedAppsIds = new List<int>();
@@ -99,6 +111,9 @@ internal class CheckingSteamAppsJob : IJob
         return updatedAppsIds;
     }
 
+    /// <summary>
+    /// Adds or updates the Steam applications.
+    /// </summary>
     private async Task AddOrUpdateSteamApplications(IReadOnlyCollection<AppItemDto> updatedApplications)
     {
         await using var scope = _scopeServiceProvider.CreateAsyncScope();
@@ -129,6 +144,9 @@ internal class CheckingSteamAppsJob : IJob
         }
     }
 
+    /// <summary>
+    /// Finds and updates the Steam applications.
+    /// </summary>
     private async Task<List<SteamSuggestItem>> FindAndUpdateSteamApplications(IReadOnlyCollection<AppItemDto> applications)
     {
         var steamSuggestResults = await FindSteamApplications(applications);
@@ -141,6 +159,9 @@ internal class CheckingSteamAppsJob : IJob
         return foundedSteamApplications;
     }
 
+    /// <summary>
+    /// Finds the Steam applications.
+    /// </summary>
     private async Task<IReadOnlyCollection<SteamSuggestItem>[]> FindSteamApplications(IEnumerable<AppItemDto> applications)
     {
         var steamSuggestTasks = applications.Select(x => _steamService.GetSteamSuggests(x.Name));
@@ -149,6 +170,9 @@ internal class CheckingSteamAppsJob : IJob
         return steamSuggestResults;
     }
 
+    /// <summary>
+    /// Compares the suggest items with the updated application IDs.
+    /// </summary>
     private static List<SteamSuggestItem> CompareSuggestWithItems(
         IEnumerable<IReadOnlyCollection<SteamSuggestItem>> steamSuggestResults,
         ICollection<int> updatedAppsIds)
@@ -160,6 +184,4 @@ internal class CheckingSteamAppsJob : IJob
             .OrderBy(x => x.AppId)
             .ToList();
     }
-
-
 }

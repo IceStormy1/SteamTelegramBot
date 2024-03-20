@@ -7,6 +7,9 @@ using Telegram.Bot.Types;
 
 namespace SteamTelegramBot.Core.Callbacks;
 
+/// <summary>
+/// Callback when user chosen application (remove or add)
+/// </summary>
 internal class ChosenAppCallback : BaseCallback
 {
     public override string Name => TelegramCallbacks.ChosenAppCallback;

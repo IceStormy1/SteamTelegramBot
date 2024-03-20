@@ -5,8 +5,17 @@ using SteamTelegramBot.Data.Entities;
 
 namespace SteamTelegramBot.Data.Extensions;
 
+/// <summary>
+/// Provides extension methods for <see cref="SteamAppEntity"/> objects.
+/// </summary>
 public static class SteamAppEntityExtensions
 {
+    /// <summary>
+    /// Converts a Steam application entity to a formatted hyperlink suitable for Telegram.
+    /// </summary>
+    /// <param name="steamAppEntity">The Steam application entity.</param>
+    /// <param name="index">The index of the application.</param>
+    /// <returns>A formatted hyperlink for Telegram.</returns>
     public static string ToTelegramHyperlink(this SteamAppEntity steamAppEntity, int index)
     {
         if (steamAppEntity is null)
@@ -18,6 +27,12 @@ public static class SteamAppEntityExtensions
         return $"{index + 1}. [{applicationTitle}]({formattedLink})";
     }
 
+    /// <summary>
+    /// Converts a Steam application entity to a DTO representing a tracked application item.
+    /// </summary>
+    /// <param name="steamAppEntity">The Steam application entity.</param>
+    /// <param name="index">The index of the application.</param>
+    /// <returns>A DTO representing the tracked application item.</returns>
     public static TrackedAppItemDto ToTrackedAppItem(this SteamAppEntity steamAppEntity, int index)
     {
         if (steamAppEntity is null)
@@ -32,6 +47,11 @@ public static class SteamAppEntityExtensions
         };
     }
 
+    /// <summary>
+    /// Formats the link to the Steam application.
+    /// </summary>
+    /// <param name="steamAppEntity">The Steam application entity.</param>
+    /// <returns>The formatted link to the Steam application.</returns>
     public static string ToFormattedApplicationLink(this SteamAppEntity steamAppEntity)
         => string.Format(
             SteamConstants.ApplicationLinkFormat,

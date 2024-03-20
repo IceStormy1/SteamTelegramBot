@@ -6,12 +6,16 @@ using Telegram.Bot.Types.Enums;
 
 namespace SteamTelegramBot.Configurations;
 
+/// <summary>
+/// Configuring webhook
+/// </summary>
 public class ConfigureWebhook : IHostedService
 {
     private readonly ILogger<ConfigureWebhook> _logger;
     private readonly IServiceProvider _serviceProvider;
     private readonly BotConfiguration _botConfig;
 
+    /// <inheritdoc cref="ConfigureWebhook"/>
     public ConfigureWebhook(
         ILogger<ConfigureWebhook> logger,
         IServiceProvider serviceProvider,
@@ -22,6 +26,11 @@ public class ConfigureWebhook : IHostedService
         _botConfig = botOptions.Value;
     }
 
+    /// <summary>
+    /// Set webhook
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         using var scope = _serviceProvider.CreateScope();
@@ -51,6 +60,11 @@ public class ConfigureWebhook : IHostedService
         _logger.LogInformation("Setting webhook was complete");
     }
 
+    /// <summary>
+    /// Remove webhook
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public async Task StopAsync(CancellationToken cancellationToken)
     {
         using var scope = _serviceProvider.CreateScope();
