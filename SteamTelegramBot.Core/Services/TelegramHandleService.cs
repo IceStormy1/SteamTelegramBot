@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SteamTelegramBot.Abstractions.Exceptions;
 using SteamTelegramBot.Abstractions.Models.Callbacks;
-using SteamTelegramBot.Common;
 using SteamTelegramBot.Common.Constants;
 using SteamTelegramBot.Core.Callbacks;
 using SteamTelegramBot.Core.Extensions;

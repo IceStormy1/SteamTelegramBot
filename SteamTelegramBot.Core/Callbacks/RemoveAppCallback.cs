@@ -16,7 +16,7 @@ internal sealed class RemoveAppCallback : BaseCallback
     {
     }
 
-    public override string Name => TelegramConstants.RemoveAppCallback;
+    public override string Name => TelegramCallbacks.RemoveAppCallback;
 
     public override async Task Execute(CallbackQuery callbackQuery, CancellationToken cancellationToken)
     {

@@ -4,5 +4,5 @@ namespace SteamTelegramBot.Abstractions.Models.Callbacks;
 
 public sealed class TrackedAppsCallbackDto : PagedCallbackDto
 {
-    public override string Name => TelegramConstants.TrackedAppsCallback;
+    public override string Name => TelegramCallbacks.TrackedAppsCallback;
 }

@@ -17,7 +17,7 @@ internal sealed class TrackedAppsCallback : BaseCallback
     {
     }
 
-    public override string Name => TelegramConstants.TrackedAppsCallback;
+    public override string Name => TelegramCallbacks.TrackedAppsCallback;
 
     public override async Task Execute(CallbackQuery callbackQuery, CancellationToken cancellationToken)
     {

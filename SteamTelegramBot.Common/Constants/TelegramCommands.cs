@@ -1,4 +1,4 @@
-﻿namespace SteamTelegramBot.Common;
+﻿namespace SteamTelegramBot.Common.Constants;
 
 public static class TelegramCommands
 {

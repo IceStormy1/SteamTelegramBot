@@ -14,7 +14,7 @@ internal sealed class MainMenuCallback : BaseCallback
     {
     }
 
-    public override string Name => TelegramConstants.MainMenuCallback;
+    public override string Name => TelegramCallbacks.MainMenuCallback;
 
     public override Task Execute(CallbackQuery callbackQuery, CancellationToken cancellationToken)
         => TelegramNotificationService.SendStartInlineKeyBoard(

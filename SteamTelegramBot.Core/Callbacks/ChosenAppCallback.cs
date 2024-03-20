@@ -9,7 +9,7 @@ namespace SteamTelegramBot.Core.Callbacks;
 
 internal class ChosenAppCallback : BaseCallback
 {
-    public override string Name => TelegramConstants.ChosenAppCallback;
+    public override string Name => TelegramCallbacks.ChosenAppCallback;
 
     public ChosenAppCallback(
         ITelegramBotClient botClient, 

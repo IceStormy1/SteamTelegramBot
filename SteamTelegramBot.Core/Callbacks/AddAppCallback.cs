@@ -18,7 +18,7 @@ internal sealed class AddAppCallback : BaseCallback
        
     }
 
-    public override string Name => TelegramConstants.AddAppCallback;
+    public override string Name => TelegramCallbacks.AddAppCallback;
 
     public override Task Execute(CallbackQuery callbackQuery, CancellationToken cancellationToken)
         => BotClient.EditMessageTextAsync(
