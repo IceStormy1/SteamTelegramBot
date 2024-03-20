@@ -5,6 +5,8 @@
 SteamTelegramBot is a Telegram bot that tracks prices of applications on Steam and notifies users when the price drops.
 
 ## Demonstration
+You can try it using the [@SteamStoreHelper_bot](https://t.me/SteamStoreHelper_bot)
+###
 ![Alt text](demo.gif)
 
 ## Setup
