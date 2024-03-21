@@ -45,7 +45,7 @@ The same setting as for SteamTelegramBot, except for `Quartz`. In **appsettings.
 ```
 
 ## Usage
-Most interactions happen through Telegram buttons (InlineKeyboardMarkup), except for adding a game to the watchlist, which is done using the command "/addgame GameName".
+Most interactions happen through Telegram buttons (InlineKeyboardMarkup), except for adding a application to the watchlist, which is done using the command "/add ApplicationName".
 
 ## Functionality
 * Tracking prices of applications on Steam.
