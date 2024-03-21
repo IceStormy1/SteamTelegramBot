@@ -22,9 +22,9 @@ internal static class ServiceCollectionExtensions
             c.CustomSchemaIds(type => type.ToString());
             c.CustomOperationIds(d => (d.ActionDescriptor as ControllerActionDescriptor)?.ActionName);
 
-            c.SwaggerDoc($"v1", new OpenApiInfo
+            c.SwaggerDoc("v1", new OpenApiInfo
             {
-                Version = $"v1",
+                Version = "v1",
                 Title = $"{CommonConstants.ApiName} API",
             });
 

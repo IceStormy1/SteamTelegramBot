@@ -1,6 +1,7 @@
 ﻿using SteamTelegramBot.Abstractions;
 using SteamTelegramBot.Abstractions.Models.Applications;
 using SteamTelegramBot.Abstractions.Models.Callbacks;
+using SteamTelegramBot.Common.Constants;
 using SteamTelegramBot.Common.Enums;
 using SteamTelegramBot.Common.Extensions;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -12,6 +13,10 @@ namespace SteamTelegramBot.Core.Helpers;
 /// </summary>
 public static class InlineKeyBoardHelper
 {
+    private const string RightArrowSymbol = "➡️";
+    private const string LeftArrowSymbol = "⬅️";
+    public const string ForbiddenSymbol = "⛔️";
+
     /// <summary>
     /// Gets an inline keyboard markup based on the specified inline keyboard type.
     /// </summary>
@@ -77,14 +82,14 @@ public static class InlineKeyBoardHelper
         {
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("Добавить игру в список",
+                InlineKeyboardButton.WithCallbackData(TelegramBotMessages.AddGameToListPrompt,
                     new AddAppCallbackDto().Serialize()),
-                InlineKeyboardButton.WithCallbackData("Удалить игру из списка",
+                InlineKeyboardButton.WithCallbackData(TelegramBotMessages.RemoveGameToListPrompt,
                     new RemoveAppCallbackDto().Serialize()),
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData("Список отслеживаемых игр",
+                InlineKeyboardButton.WithCallbackData(TelegramBotMessages.TrackedApplications,
                     new TrackedAppsCallbackDto().Serialize())
             }
         };
@@ -92,7 +97,7 @@ public static class InlineKeyBoardHelper
     private static InlineKeyboardButton[] GetBackMainMenuButton()
         => new[]
         {
-            InlineKeyboardButton.WithCallbackData("Вернуться в главное меню", new MainMenuCallbackDto().Serialize())
+            InlineKeyboardButton.WithCallbackData(TelegramBotMessages.BackToMainMenu, new MainMenuCallbackDto().Serialize())
         };
 
     private static InlineKeyboardButton[] GetPagingButtons(IPaged pageInfo, AppAction appAction)
@@ -102,12 +107,12 @@ public static class InlineKeyBoardHelper
         var isFirstPage = pageInfo.Current == IPaged.DefaultPage;
         var isLastPage = pageInfo.Current == pageInfo.Total;
 
-        var previousButtonText = isFirstPage ? "⛔️" : "⬅️";
+        var previousButtonText = isFirstPage ? ForbiddenSymbol : LeftArrowSymbol;
         callback.Current = isFirstPage ? pageInfo.Current : pageInfo.Current - 1;
         callback.Ignore = isFirstPage;
         var previousButton = InlineKeyboardButton.WithCallbackData(text: previousButtonText, callbackData: callback.Serialize());
 
-        var nextButtonText = isLastPage ? "⛔️" : "➡️";
+        var nextButtonText = isLastPage ? ForbiddenSymbol : RightArrowSymbol;
         callback.Current = isLastPage ? pageInfo.Current : pageInfo.Current + 1;
         callback.Ignore = isLastPage;
         var nextButton = InlineKeyboardButton.WithCallbackData(text: nextButtonText, callbackData: callback.Serialize());

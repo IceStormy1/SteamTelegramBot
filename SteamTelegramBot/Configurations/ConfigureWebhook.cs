@@ -38,7 +38,7 @@ public class ConfigureWebhook : IHostedService
 
         var webHookAddress = $"{_botConfig.HostAddress}{_botConfig.Route}";
         _logger.LogInformation("Setting webhook: {WebHookAddress}", webHookAddress);
-
+    
         await botClient.SetWebhookAsync(
             url: webHookAddress,
             allowedUpdates: Array.Empty<UpdateType>(),
@@ -50,13 +50,14 @@ public class ConfigureWebhook : IHostedService
             scope: BotCommandScope.AllPrivateChats(),
             commands: new List<BotCommand>
             {
-                new() { Command = TelegramCommands.StartCommand, Description = "Перезапустить бота" },
-                new() { Command = TelegramCommands.AddGameCommand, Description = "Добавить игру для отслеживания цены" }
+                new() { Command = TelegramCommands.StartCommand, Description = TelegramBotMessages.RestartBot },
+                new() { Command = TelegramCommands.AddGameCommand, Description = TelegramBotMessages.AddGameForTracking }
             });
 
-        await botClient.SetMyDescriptionAsync(TelegramMessages.BotDescription, cancellationToken: cancellationToken);
-        await botClient.SetMyShortDescriptionAsync("Телеграм бот для отслеживания цен на игры в Steam. " +
-                                                   $"По всем вопросам обращаться к @{_botConfig.OwnerUsername}", cancellationToken: cancellationToken);
+        await botClient.SetMyDescriptionAsync(TelegramBotMessages.BotDescription, cancellationToken: cancellationToken);
+
+        var shortDescription = string.Format(TelegramBotMessages.BotShortDescriptionFormat, _botConfig.OwnerUsername);
+        await botClient.SetMyShortDescriptionAsync(shortDescription, cancellationToken: cancellationToken);
         
         _logger.LogInformation("Setting webhook was complete");
     }

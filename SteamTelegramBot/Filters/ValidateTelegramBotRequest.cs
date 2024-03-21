@@ -21,6 +21,7 @@ public sealed class ValidateTelegramBot : TypeFilterAttribute
 
     private class ValidateTelegramBotFilter : IActionFilter
     {
+        private const string TelegramApiKeyHeader = "X-Telegram-Bot-Api-Secret-Token";
         private readonly string _secretToken;
 
         public ValidateTelegramBotFilter(IOptions<BotConfiguration> options)
@@ -46,7 +47,7 @@ public sealed class ValidateTelegramBot : TypeFilterAttribute
 
         private bool IsValidRequest(HttpRequest request)
         {
-            var isSecretTokenProvided = request.Headers.TryGetValue("X-Telegram-Bot-Api-Secret-Token", out var secretTokenHeader);
+            var isSecretTokenProvided = request.Headers.TryGetValue(TelegramApiKeyHeader, out var secretTokenHeader);
 
             return isSecretTokenProvided 
                    && string.Equals(secretTokenHeader, _secretToken, StringComparison.Ordinal);

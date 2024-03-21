@@ -86,7 +86,7 @@ internal class ChosenAppCallback : BaseCallback
 
         await BotClient.AnswerCallbackQueryAsync(
             callbackQueryId: callbackQuery.Id,
-            text: isSuccess ? "Игра добавлена в список" : errorMessage,
+            text: isSuccess ? TelegramBotMessages.ApplicationWasAdded : errorMessage,
             cancellationToken: cancellationToken);
 
         return isSuccess;
@@ -99,7 +99,7 @@ internal class ChosenAppCallback : BaseCallback
 
         await BotClient.AnswerCallbackQueryAsync(
             callbackQueryId: callbackQuery.Id,
-            text: isSuccess ? "Игра удалена из списка" : errorMessage,
+            text: isSuccess ? TelegramBotMessages.ApplicationWasDeleted : errorMessage,
             cancellationToken: cancellationToken);
 
         return isSuccess;

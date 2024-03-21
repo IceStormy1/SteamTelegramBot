@@ -18,23 +18,16 @@ public static class ServiceCollectionQuartzConfiguratorExtensions
         IConfiguration config)
         where T : IJob
     {
-        // Use the name of the IJob as the appsettings.json key
         var jobName = typeof(T).FullName;
 
         if (string.IsNullOrWhiteSpace(jobName))
-        {
             throw new InvalidOperationException("Unable to determine job name");
-        }
 
-        // Try and load the schedule from configuration
         var cronSchedule = config[jobName];
 
         if (string.IsNullOrEmpty(cronSchedule))
-        {
             throw new ArgumentException($"No Quartz.NET Cron schedule found for job in configuration at {jobName}");
-        }
 
-        // register the job
         var jobKey = new JobKey(jobName);
         quartz.AddJob<T>(opts => opts.WithIdentity(jobKey));
 

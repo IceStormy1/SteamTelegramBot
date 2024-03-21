@@ -13,7 +13,6 @@ public static class StringExtensions
     {
         const string pattern = @"[_\*\~`>#\+\-=|{}\.!]";
 
-        // Заменяем специальные символы на их экранированные версии
         var escapedString = Regex.Replace(text, pattern, @"\$&");
 
         return escapedString;

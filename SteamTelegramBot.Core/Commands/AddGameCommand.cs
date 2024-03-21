@@ -35,7 +35,7 @@ internal sealed class AddGameCommand : BaseCommand
         {
             await BotClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: TelegramMessages.NeedToApplicationName,
+                text: TelegramBotMessages.NeedToApplicationName,
                 parseMode: ParseMode.MarkdownV2,
                 cancellationToken: cancellationToken);
             return;
@@ -47,14 +47,14 @@ internal sealed class AddGameCommand : BaseCommand
         {
             await BotClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: TelegramMessages.GameNotFound,
+                text: TelegramBotMessages.GameNotFound,
                 cancellationToken: cancellationToken);
             return;
         }
 
         await BotClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
-            text: "Выберите один из вариантов, нажав на соответствующую кнопку",
+            text: TelegramBotMessages.OptionsPrompt,
             replyMarkup: InlineKeyBoardHelper.GetAddGameInlineKeyboard(steamApps),
             cancellationToken: cancellationToken
         );

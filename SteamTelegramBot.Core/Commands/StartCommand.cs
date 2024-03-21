@@ -25,7 +25,7 @@ internal sealed class StartCommand : BaseCommand
     {
         await BotClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
-            text: TelegramMessages.StartMessage,
+            text: TelegramBotMessages.StartMessage,
             cancellationToken: cancellationToken);
 
         await _telegramNotificationService.SendStartInlineKeyBoard(chatId: message.Chat.Id, cancellationToken);

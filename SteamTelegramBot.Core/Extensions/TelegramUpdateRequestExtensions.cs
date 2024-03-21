@@ -17,9 +17,6 @@ public static class TelegramUpdateRequestExtensions
             case { CallbackQuery: { } callbackQuery }:
                 return callbackQuery.Message!.Chat.Id;
 
-            //case { InlineQuery: { } inlineQuery }:
-            //    return inlineQuery.Chat.Id;
-
             case { ChosenInlineResult: { } chosenInlineResult }:
                 return chosenInlineResult.From.Id;
 

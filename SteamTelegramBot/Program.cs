@@ -98,7 +98,8 @@ static async Task HandleError(HttpContext context, IServiceProvider serviceProvi
 
     if (exception is TelegramException telegramException)
     {
-        context.Response.StatusCode = StatusCodes.Status200OK; // Telegram will do a retry in case of an error, so the status is 200
+        // Telegram will do a retry in case of an error, so the status is 200
+        context.Response.StatusCode = StatusCodes.Status200OK;
         await telegramClient.SendTextMessageAsync(
             chatId: telegramException.ChatId,
             text: exception.Message);
