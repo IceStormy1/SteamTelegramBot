@@ -18,7 +18,7 @@ internal sealed class UserRepository : BaseRepository<UserEntity>, IUserReposito
     public async Task UpdateUser(User telegramUser, UserEntity userEntity, long chatId)
     {
         Mapper.Map(telegramUser, userEntity);
-        userEntity.TelegramId = userEntity.Id;
+        userEntity.TelegramId = telegramUser.Id;
         userEntity.TelegramChatId = chatId;
 
         await DbContext.SaveChangesAsync();

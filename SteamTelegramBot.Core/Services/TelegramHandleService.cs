@@ -85,7 +85,7 @@ internal sealed class TelegramHandleService : BaseService, ITelegramHandleServic
 
         var commandName = messageText.Split(' ')[0];
 
-        var command = _telegramCommands.FirstOrDefault(x => x.Name == commandName);
+        var command = _telegramCommands.Find(x => x.Name == commandName);
         if (command is null)
         {
             await UnknownCommand(message, cancellationToken);
@@ -99,7 +99,7 @@ internal sealed class TelegramHandleService : BaseService, ITelegramHandleServic
     {
         var callbackDto = JsonConvert.DeserializeObject<BaseCallbackDto>(callbackQuery.Data ?? string.Empty);
 
-        var callback = _telegramCallbacks.FirstOrDefault(x => string.Equals(x.Name, callbackDto?.Name));
+        var callback = _telegramCallbacks.Find(x => string.Equals(x.Name, callbackDto?.Name));
 
         if (callback is null)
         {
