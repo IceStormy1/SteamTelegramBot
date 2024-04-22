@@ -6,7 +6,7 @@ using Telegram.Bot.Types;
 namespace SteamTelegramBot.Controllers;
 
 /// <summary>
-/// Telegram bot controller
+/// Telegram bot controller.
 /// </summary>
 [ApiController]
 [Route("[controller]")]
@@ -15,12 +15,7 @@ public class BotController : ControllerBase
     private readonly ITelegramHandleService _telegramService;
 
     /// <inheritdoc cref="BotController"/>
-    public BotController(
-        ITelegramHandleService telegramService
-    )
-    {
-        _telegramService = telegramService;
-    }
+    public BotController(ITelegramHandleService telegramService) => _telegramService = telegramService;
 
     /// <summary>
     /// Telegram request
