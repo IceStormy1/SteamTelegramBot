@@ -41,6 +41,7 @@ var host = Host.CreateDefaultBuilder(args)
                 var quartzConfig = context.Configuration.GetSection("Quartz");
 
                 q.AddJobAndTrigger<CheckingSteamAppsJob>(quartzConfig);
+                q.AddJobAndTrigger<PriceTrackingJob>(quartzConfig);
             })
             .AddQuartzHostedService(options =>
             {
