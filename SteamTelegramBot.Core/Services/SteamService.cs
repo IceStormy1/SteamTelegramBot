@@ -9,30 +9,20 @@ using SteamTelegramBot.Data.Interfaces;
 
 namespace SteamTelegramBot.Core.Services;
 
-internal sealed class SteamService : BaseService, ISteamService
+internal sealed class SteamService(
+    IMapper mapper,
+    ILogger<SteamService> logger,
+    ISteamWebApiClient steamWebApiClient,
+    IStoreSteamPoweredClient storeSteamPoweredClient,
+    ISteamAppRepository steamAppRepository)
+    : BaseService(mapper, logger), ISteamService
 {
     private const string NameHtmlTag = "match_name";
     private const string PriceHtmlTag = "match_subtitle";
 
-    private readonly ISteamWebApiClient _steamWebApiClient;
-    private readonly IStoreSteamPoweredClient _storeSteamPoweredClient;
-    private readonly ISteamAppRepository _steamAppRepository;
-
-    public SteamService(
-        IMapper mapper, 
-        ILogger<SteamService> logger,
-        ISteamWebApiClient steamWebApiClient,
-        IStoreSteamPoweredClient storeSteamPoweredClient, 
-        ISteamAppRepository steamAppRepository) : base(mapper, logger)
-    {
-        _steamWebApiClient = steamWebApiClient;
-        _storeSteamPoweredClient = storeSteamPoweredClient;
-        _steamAppRepository = steamAppRepository;
-    }
-
     public async Task<IReadOnlyCollection<AppItemDto>> GetAllSteamApps()
     {
-        var allSteamApps = await _steamWebApiClient.GetAllApps();
+        var allSteamApps = await steamWebApiClient.GetAllApps();
 
         if (!allSteamApps.IsSuccessStatusCode || allSteamApps.Content is null)
             throw new SteamException(allSteamApps.Error, "An error occurred while receiving all applications");
@@ -46,7 +36,7 @@ internal sealed class SteamService : BaseService, ISteamService
 
     public async Task<IReadOnlyCollection<SteamSuggestItem>> GetSteamSuggests(string steamAppName, bool filterByExistingApps = false)
     {
-        var steamSuggestsHtml = await _storeSteamPoweredClient.GetSuggests(steamAppName);
+        var steamSuggestsHtml = await storeSteamPoweredClient.GetSuggests(steamAppName);
 
         var steamSuggestItems = steamSuggestsHtml.Split("ds_collapse_flag")
             .Where(s => s.Contains(NameHtmlTag) && s.Contains(PriceHtmlTag))
@@ -57,7 +47,7 @@ internal sealed class SteamService : BaseService, ISteamService
             return steamSuggestItems;
 
         var steamSuggestItemsIds = steamSuggestItems.Select(x => x.AppId).ToList();
-        var existingAppsIds = await _steamAppRepository.CheckSteamApplicationsByIds(steamSuggestItemsIds);
+        var existingAppsIds = await steamAppRepository.CheckSteamApplicationsByIds(steamSuggestItemsIds);
 
         return steamSuggestItems.Where(x => existingAppsIds.Contains(x.AppId)).ToList();
     }
@@ -68,7 +58,7 @@ internal sealed class SteamService : BaseService, ISteamService
             return;
 
         var steamSuggestIds = steamSuggestItems.Select(item => item.AppId).ToList();
-        var existingApps = await _steamAppRepository.GetSteamApplicationsByIds(steamSuggestIds);
+        var existingApps = await steamAppRepository.GetSteamApplicationsByIds(steamSuggestIds);
         var existingAppsIds = existingApps.Select(entity => entity.SteamAppId).ToList();
         var newApps = steamSuggestItems.Where(item => !existingAppsIds.Contains(item.AppId)).ToList();
 
@@ -86,7 +76,7 @@ internal sealed class SteamService : BaseService, ISteamService
         var newEntities = Mapper.Map<List<SteamAppEntity>>(newSteamApps);
         AddNewPrice(newSteamApps, newEntities);
 
-        await _steamAppRepository.AddRange(newEntities);
+        await steamAppRepository.AddRange(newEntities);
 
         return newEntities;
     }
@@ -104,7 +94,7 @@ internal sealed class SteamService : BaseService, ISteamService
 
         AddNewPrice(steamSuggestItems, appsWithDifferentPrice);
 
-        await _steamAppRepository.UpdateRange(
+        await steamAppRepository.UpdateRange(
             source: steamSuggestItems, 
             entities: existingSteamApps, 
             find: (src, target) => target.First(t => t.SteamAppId == src.AppId));

@@ -8,17 +8,11 @@ namespace SteamTelegramBot.Core.Commands;
 /// <summary>
 /// Represents a command for starting interaction with a Telegram bot.
 /// </summary>
-internal sealed class StartCommand : BaseCommand
+internal sealed class StartCommand(
+    ITelegramBotClient botClient,
+    ITelegramNotificationService telegramNotificationService)
+    : BaseCommand(botClient)
 {
-    private readonly ITelegramNotificationService _telegramNotificationService;
-
-    public StartCommand(
-        ITelegramBotClient botClient,
-        ITelegramNotificationService telegramNotificationService) : base(botClient)
-    {
-        _telegramNotificationService = telegramNotificationService;
-    }
-
     public override string Name => TelegramCommands.StartCommand;
 
     public override async Task Execute(Message message, CancellationToken cancellationToken)
@@ -28,6 +22,6 @@ internal sealed class StartCommand : BaseCommand
             text: TelegramBotMessages.StartMessage,
             cancellationToken: cancellationToken);
 
-        await _telegramNotificationService.SendStartInlineKeyBoard(chatId: message.Chat.Id, cancellationToken);
+        await telegramNotificationService.SendStartInlineKeyBoard(chatId: message.Chat.Id, cancellationToken);
     }
 }

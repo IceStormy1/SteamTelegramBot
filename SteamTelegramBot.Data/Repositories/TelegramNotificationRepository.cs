@@ -5,14 +5,10 @@ using SteamTelegramBot.Data.Interfaces;
 
 namespace SteamTelegramBot.Data.Repositories;
 
-internal sealed class TelegramNotificationRepository : BaseRepository<TelegramNotificationEntity>, ITelegramNotificationRepository
+internal sealed class TelegramNotificationRepository(
+    SteamTelegramBotDbContext dbContext,
+    IMapper mapper) : BaseRepository<TelegramNotificationEntity>(dbContext, mapper), ITelegramNotificationRepository
 {
-    public TelegramNotificationRepository(
-        SteamTelegramBotDbContext dbContext,
-        IMapper mapper) : base(dbContext, mapper)
-    {
-    }
-
     public async Task<Dictionary<long, List<TelegramNotificationEntity>>> GetUnNotifiedUsers(List<int> applicationIds)
     {
         var usersWithUnsentNotifications = await DbContext.TelegramNotifications

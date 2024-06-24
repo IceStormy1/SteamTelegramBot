@@ -6,14 +6,9 @@ namespace SteamTelegramBot.Core.Commands;
 /// <summary>
 /// Represents a base class for commands in a Telegram bot.
 /// </summary>
-internal abstract class BaseCommand
+internal abstract class BaseCommand(ITelegramBotClient botClient)
 {
-    protected readonly ITelegramBotClient BotClient;
-
-    protected BaseCommand(ITelegramBotClient botClient)
-    {
-        BotClient = botClient;
-    }
+    protected readonly ITelegramBotClient BotClient = botClient;
 
     /// <summary>
     /// Name of the command.

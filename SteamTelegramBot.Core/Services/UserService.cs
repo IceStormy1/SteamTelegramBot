@@ -7,21 +7,15 @@ using Telegram.Bot.Types;
 
 namespace SteamTelegramBot.Core.Services;
 
-internal sealed class UserService : BaseService, IUserService
+internal sealed class UserService(
+    IMapper mapper,
+    ILogger<UserService> logger,
+    IUserRepository userRepository)
+    : BaseService(mapper, logger), IUserService
 {
-    private readonly IUserRepository _userRepository;
-
-    public UserService(
-        IMapper mapper, 
-        ILogger<UserService> logger,
-        IUserRepository userRepository) : base(mapper, logger)
-    {
-        _userRepository = userRepository;
-    }
-
     public async Task AddOrUpdateUser(User telegramUser, long chatId)
     {
-        var userEntity = await _userRepository.GetUserByTelegramId(telegramUser.Id);
+        var userEntity = await userRepository.GetUserByTelegramId(telegramUser.Id);
 
         if (userEntity is null)
         {
@@ -29,11 +23,11 @@ internal sealed class UserService : BaseService, IUserService
             userEntity.TelegramId = telegramUser.Id;
             userEntity.TelegramChatId = chatId;
 
-            await _userRepository.Add(userEntity);
+            await userRepository.Add(userEntity);
         }
         else
         {
-            await _userRepository.UpdateUser(telegramUser, userEntity, chatId);
+            await userRepository.UpdateUser(telegramUser, userEntity, chatId);
         }
     }
 }

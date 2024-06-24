@@ -8,15 +8,12 @@ namespace SteamTelegramBot.Core.Callbacks;
 /// <summary>
 /// Callback for sent main menu
 /// </summary>
-internal sealed class MainMenuCallback : BaseCallback
+internal sealed class MainMenuCallback(
+    ITelegramBotClient botClient,
+    IUserAppTrackingService userAppTrackingService,
+    ITelegramNotificationService telegramNotificationService)
+    : BaseCallback(botClient, userAppTrackingService, telegramNotificationService)
 {
-    public MainMenuCallback(
-        ITelegramBotClient botClient,
-        IUserAppTrackingService userAppTrackingService,
-        ITelegramNotificationService telegramNotificationService) : base(botClient, userAppTrackingService, telegramNotificationService)
-    {
-    }
-
     public override string Name => TelegramCallbacks.MainMenuCallback;
 
     public override Task Execute(CallbackQuery callbackQuery, CancellationToken cancellationToken)

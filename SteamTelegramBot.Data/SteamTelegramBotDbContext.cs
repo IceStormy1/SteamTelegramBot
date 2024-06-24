@@ -6,17 +6,13 @@ using System.Reflection;
 
 namespace SteamTelegramBot.Data;
 
-public sealed class SteamTelegramBotDbContext : DbContext
+public sealed class SteamTelegramBotDbContext(DbContextOptions options) : DbContext(options)
 {
     public DbSet<UserEntity> Users { get; set; }
     public DbSet<SteamAppEntity> SteamApps { get; set; }
     public DbSet<UserAppTrackingEntity> UserTrackedApps { get; set; }
     public DbSet<SteamAppPriceHistoryEntity> SteamAppPriceHistory { get; set; }
     public DbSet<TelegramNotificationEntity> TelegramNotifications { get; set; }
-
-    public SteamTelegramBotDbContext(DbContextOptions options) : base(options)
-    {
-    }
 
     public override int SaveChanges()
     {

@@ -8,16 +8,12 @@ using Telegram.Bot.Types.Enums;
 
 namespace SteamTelegramBot.Core.Callbacks;
 
-internal sealed class AddAppCallback : BaseCallback
+internal sealed class AddAppCallback(
+    ITelegramBotClient botClient,
+    IUserAppTrackingService userAppTrackingService,
+    ITelegramNotificationService telegramNotificationService)
+    : BaseCallback(botClient, userAppTrackingService, telegramNotificationService)
 {
-    public AddAppCallback(
-        ITelegramBotClient botClient, 
-        IUserAppTrackingService userAppTrackingService,
-        ITelegramNotificationService telegramNotificationService) : base(botClient, userAppTrackingService, telegramNotificationService)
-    {
-       
-    }
-
     public override string Name => TelegramCallbacks.AddAppCallback;
 
     public override Task Execute(CallbackQuery callbackQuery, CancellationToken cancellationToken)

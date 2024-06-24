@@ -10,17 +10,11 @@ namespace SteamTelegramBot.Core.Commands;
 /// <summary>
 /// Represents a command for adding a game
 /// </summary>
-internal sealed class AddGameCommand : BaseCommand
+internal sealed class AddGameCommand(
+    ITelegramBotClient botClient,
+    ISteamService steamService)
+    : BaseCommand(botClient)
 {
-    private readonly ISteamService _steamService;
-
-    public AddGameCommand(
-        ITelegramBotClient botClient, 
-        ISteamService steamService) : base(botClient)
-    {
-        _steamService = steamService;
-    }
-
     public override string Name => TelegramCommands.AddGameCommand;
 
     public override async Task Execute(Message message, CancellationToken cancellationToken)
@@ -41,7 +35,7 @@ internal sealed class AddGameCommand : BaseCommand
             return;
         }
 
-        var steamApps = await _steamService.GetSteamSuggests(appName, filterByExistingApps: true);
+        var steamApps = await steamService.GetSteamSuggests(appName, filterByExistingApps: true);
 
         if (steamApps.Count == default)
         {

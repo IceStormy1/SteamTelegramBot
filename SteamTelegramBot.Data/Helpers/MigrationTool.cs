@@ -7,16 +7,9 @@ namespace SteamTelegramBot.Data.Helpers;
 /// <summary>
 /// Represents a migration tool for applying database migrations.
 /// </summary>
-public sealed class MigrationTool
+public sealed class MigrationTool(IServiceProvider rootServiceProvider)
 {
-    private readonly IServiceProvider _rootServiceProvider;
-    private readonly ILogger<MigrationTool> _logger;
-
-    public MigrationTool(IServiceProvider rootServiceProvider)
-    {
-        _rootServiceProvider = rootServiceProvider;
-        _logger = rootServiceProvider.GetRequiredService<ILogger<MigrationTool>>();
-    }
+    private readonly ILogger<MigrationTool> _logger = rootServiceProvider.GetRequiredService<ILogger<MigrationTool>>();
 
     /// <summary>
     /// Executes the migration process using the specified service provider.
@@ -34,7 +27,7 @@ public sealed class MigrationTool
 
         try
         {
-            using var scope = _rootServiceProvider.CreateScope();
+            using var scope = rootServiceProvider.CreateScope();
 
             var dbContext = scope.ServiceProvider.GetRequiredService<SteamTelegramBotDbContext>();
 

@@ -5,15 +5,11 @@ using SteamTelegramBot.Data.Interfaces;
 
 namespace SteamTelegramBot.Data.Repositories;
 
-internal sealed class SteamAppRepository : BaseRepository<SteamAppEntity>, ISteamAppRepository
+internal sealed class SteamAppRepository(
+    SteamTelegramBotDbContext dbContext,
+    IMapper mapper) : BaseRepository<SteamAppEntity>(dbContext, mapper), ISteamAppRepository
 {
     private const byte MaxPriceHistory = 2;
-
-    public SteamAppRepository(
-        SteamTelegramBotDbContext dbContext,
-        IMapper mapper) : base(dbContext, mapper)
-    {
-    }
 
     public Task<List<SteamAppEntity>> GetSteamApplicationsByIds(ICollection<int> steamAppsIds)
         => DbSet

@@ -6,12 +6,9 @@ using Telegram.Bot.Types;
 
 namespace SteamTelegramBot.Data.Repositories;
 
-internal sealed class UserRepository : BaseRepository<UserEntity>, IUserRepository
+internal sealed class UserRepository(SteamTelegramBotDbContext dbContext, IMapper mapper)
+    : BaseRepository<UserEntity>(dbContext, mapper), IUserRepository
 {
-    public UserRepository(SteamTelegramBotDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
-    {
-    }
-
     public Task<UserEntity> GetUserByTelegramId(long telegramId)
         => DbSet.FirstOrDefaultAsync(x => x.TelegramId == telegramId);
 

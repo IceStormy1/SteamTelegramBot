@@ -13,29 +13,18 @@ using Telegram.Bot.Types;
 
 namespace SteamTelegramBot.Core.Services;
 
-internal sealed class TelegramHandleService : BaseService, ITelegramHandleService
+internal sealed class TelegramHandleService(
+    IMapper mapper,
+    ILogger<TelegramHandleService> logger,
+    ITelegramBotClient botClient,
+    IUserService userService,
+    ITelegramNotificationService telegramNotificationService,
+    IEnumerable<BaseCallback> telegramCallbacks,
+    IEnumerable<BaseCommand> telegramCommands)
+    : BaseService(mapper, logger), ITelegramHandleService
 {
-    private readonly ITelegramBotClient _botClient;
-    private readonly IUserService _userService;
-    private readonly ITelegramNotificationService _telegramNotificationService;
-    private readonly List<BaseCallback> _telegramCallbacks;
-    private readonly List<BaseCommand> _telegramCommands;
-
-    public TelegramHandleService(
-        IMapper mapper,
-        ILogger<TelegramHandleService> logger,
-        ITelegramBotClient botClient,
-        IUserService userService,
-        ITelegramNotificationService telegramNotificationService,
-        IEnumerable<BaseCallback> telegramCallbacks,
-        IEnumerable<BaseCommand> telegramCommands) : base(mapper, logger)
-    {
-        _botClient = botClient;
-        _userService = userService;
-        _telegramNotificationService = telegramNotificationService;
-        _telegramCommands = telegramCommands.ToList();
-        _telegramCallbacks = telegramCallbacks.ToList();
-    }
+    private readonly List<BaseCallback> _telegramCallbacks = telegramCallbacks.ToList();
+    private readonly List<BaseCommand> _telegramCommands = telegramCommands.ToList();
 
     public async Task HandleUpdateAsync(Update update, CancellationToken cancellationToken)
     {
@@ -78,7 +67,7 @@ internal sealed class TelegramHandleService : BaseService, ITelegramHandleServic
     {
         Logger.LogInformation("Receive message type: {MessageType}", message.Type);
 
-        await _userService.AddOrUpdateUser(message.From, message.Chat.Id);
+        await userService.AddOrUpdateUser(message.From, message.Chat.Id);
 
         if (message.Text is not { } messageText)
             return;
@@ -112,12 +101,12 @@ internal sealed class TelegramHandleService : BaseService, ITelegramHandleServic
 
     private async Task UnknownCommand(Message message, CancellationToken cancellationToken)
     {
-        await _botClient.SendTextMessageAsync(
+        await botClient.SendTextMessageAsync(
             chatId: message.Chat.Id,
             text: "Неизвестная команда. Попробуйте ещё раз",
             cancellationToken: cancellationToken);
 
-        await _telegramNotificationService.SendStartInlineKeyBoard(message.Chat.Id, cancellationToken);
+        await telegramNotificationService.SendStartInlineKeyBoard(message.Chat.Id, cancellationToken);
     }
 
     private void UnknownUpdateHandlerAsync()

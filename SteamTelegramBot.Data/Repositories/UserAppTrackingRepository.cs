@@ -6,12 +6,9 @@ using SteamTelegramBot.Data.Interfaces;
 
 namespace SteamTelegramBot.Data.Repositories;
 
-internal sealed class UserAppTrackingRepository : BaseRepository<UserAppTrackingEntity>, IUserAppTrackingRepository
+internal sealed class UserAppTrackingRepository(SteamTelegramBotDbContext dbContext, IMapper mapper)
+    : BaseRepository<UserAppTrackingEntity>(dbContext, mapper), IUserAppTrackingRepository
 {
-    public UserAppTrackingRepository(SteamTelegramBotDbContext dbContext, IMapper mapper) : base(dbContext, mapper)
-    {
-    }
-
     public async Task<ListResponseDto<SteamAppEntity>> GetTrackedApplicationsByTelegramId(long telegramUserId, byte limit,
         int offset)
     {

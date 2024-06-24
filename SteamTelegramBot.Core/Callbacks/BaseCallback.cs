@@ -8,21 +8,14 @@ namespace SteamTelegramBot.Core.Callbacks;
 /// <summary>
 /// Represents a base class for handling callback queries in a Telegram bot.
 /// </summary>
-internal abstract class BaseCallback
+internal abstract class BaseCallback(
+    ITelegramBotClient botClient,
+    IUserAppTrackingService userAppTrackingService,
+    ITelegramNotificationService telegramNotificationService)
 {
-    protected readonly ITelegramBotClient BotClient;
-    protected readonly IUserAppTrackingService UserAppTrackingService;
-    protected readonly ITelegramNotificationService TelegramNotificationService;
-
-    protected BaseCallback(
-        ITelegramBotClient botClient,
-        IUserAppTrackingService userAppTrackingService, 
-        ITelegramNotificationService telegramNotificationService)
-    {
-        BotClient = botClient;
-        UserAppTrackingService = userAppTrackingService;
-        TelegramNotificationService = telegramNotificationService;
-    }
+    protected readonly ITelegramBotClient BotClient = botClient;
+    protected readonly IUserAppTrackingService UserAppTrackingService = userAppTrackingService;
+    protected readonly ITelegramNotificationService TelegramNotificationService = telegramNotificationService;
 
     /// <summary>
     /// Name of the callback.

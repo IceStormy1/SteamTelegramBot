@@ -18,32 +18,20 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace SteamTelegramBot.Core.Services;
 
-internal sealed class TelegramNotificationService : BaseService, ITelegramNotificationService
+internal sealed class TelegramNotificationService(
+    IMapper mapper,
+    ILogger<TelegramNotificationService> logger,
+    ITelegramBotClient botClient,
+    ITelegramNotificationRepository telegramNotificationRepository,
+    IUserAppTrackingService userAppTrackingService)
+    : BaseService(mapper, logger), ITelegramNotificationService
 {
     private const byte LimitOfSentMessages = 30;
     private const byte TelegramMessageDelayInSeconds = 1;
 
-    private readonly ITelegramBotClient _botClient;
-    private readonly ITelegramNotificationRepository _telegramNotificationRepository;
-    private readonly IUserAppTrackingService _userAppTrackingService;
-    private readonly ILogger<TelegramNotificationService> _logger;
-
-    public TelegramNotificationService(
-        IMapper mapper, 
-        ILogger<TelegramNotificationService> logger, 
-        ITelegramBotClient botClient,
-        ITelegramNotificationRepository telegramNotificationRepository,
-        IUserAppTrackingService userAppTrackingService) : base(mapper, logger)
-    {
-        _botClient = botClient;
-        _telegramNotificationRepository = telegramNotificationRepository;
-        _logger = logger;
-        _userAppTrackingService = userAppTrackingService;
-    }
-
     public async Task NotifyUsersOfPriceDrop(List<int> applicationIds)
     {
-        var unNotifiedUsers = await _telegramNotificationRepository.GetUnNotifiedUsers(applicationIds);
+        var unNotifiedUsers = await telegramNotificationRepository.GetUnNotifiedUsers(applicationIds);
 
         if (unNotifiedUsers.Count == default)
             return;
@@ -71,7 +59,7 @@ internal sealed class TelegramNotificationService : BaseService, ITelegramNotifi
         var notifications = unNotifiedUsers.SelectMany(x => x.Value).ToList();
         await MarkMessageAsSent(notifications);
 
-        _logger.LogInformation("Sent {TotalSentMessages} messages to telegram users", totalSentMessages);
+        logger.LogInformation("Sent {TotalSentMessages} messages to telegram users", totalSentMessages);
     }
 
     public async Task<Message> SendStartInlineKeyBoard(long chatId, CancellationToken cancellationToken, int? messageId = null)
@@ -80,7 +68,7 @@ internal sealed class TelegramNotificationService : BaseService, ITelegramNotifi
 
         if (messageId.HasValue)
         {
-            return await _botClient.EditMessageTextAsync(
+            return await botClient.EditMessageTextAsync(
                 chatId: chatId,
                 messageId: messageId.Value,
                 text: text,
@@ -88,7 +76,7 @@ internal sealed class TelegramNotificationService : BaseService, ITelegramNotifi
                 cancellationToken: cancellationToken);
         }
 
-        return await _botClient.SendTextMessageAsync(
+        return await botClient.SendTextMessageAsync(
             chatId: chatId,
             text: text,
             replyMarkup: InlineKeyBoardHelper.GetInlineKeyboardByType(InlineKeyBoardType.Start),
@@ -119,7 +107,7 @@ internal sealed class TelegramNotificationService : BaseService, ITelegramNotifi
     }
 
     private Task<ListResponseDto<TrackedAppItemDto>> GetUserTrackedAppsAsync(long telegramUserId, IPaged pageInfo)
-        => _userAppTrackingService.GetUserTrackedApps(
+        => userAppTrackingService.GetUserTrackedApps(
             telegramUserId: telegramUserId,
             limit: pageInfo.Size,
             offset: (pageInfo.Current - 1) * pageInfo.Size);
@@ -153,7 +141,7 @@ internal sealed class TelegramNotificationService : BaseService, ITelegramNotifi
     {
         if (currentPage <= IPaged.DefaultPage)
         {
-            await _botClient.EditMessageTextAsync(
+            await botClient.EditMessageTextAsync(
                 chatId,
                 messageId,
                 text: text,
@@ -164,7 +152,7 @@ internal sealed class TelegramNotificationService : BaseService, ITelegramNotifi
         }
         else
         {
-            await _botClient.EditMessageReplyMarkupAsync(
+            await botClient.EditMessageReplyMarkupAsync(
                 chatId,
                 messageId,
                 replyMarkup: replyMarkup,
@@ -191,12 +179,12 @@ internal sealed class TelegramNotificationService : BaseService, ITelegramNotifi
     private async Task SendTelegramMessage(long chatId, string text)
     {
         text = text.ToTelegramMarkdownMessageText();
-        await _botClient.SendTextMessageAsync(chatId: chatId, text: text, parseMode: ParseMode.MarkdownV2, disableWebPagePreview: true);
+        await botClient.SendTextMessageAsync(chatId: chatId, text: text, parseMode: ParseMode.MarkdownV2, disableWebPagePreview: true);
     }
 
     private async Task MarkMessageAsSent(List<TelegramNotificationEntity> telegramNotifications)
     {
         telegramNotifications.ForEach(notification=>notification.WasSent = true);
-        await _telegramNotificationRepository.UpdateRange(telegramNotifications);
+        await telegramNotificationRepository.UpdateRange(telegramNotifications);
     }
 }

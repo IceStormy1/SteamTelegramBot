@@ -10,16 +10,13 @@ namespace SteamTelegramBot.Core.Callbacks;
 /// <summary>
 /// Callback when user chosen application (remove or add)
 /// </summary>
-internal class ChosenAppCallback : BaseCallback
+internal class ChosenAppCallback(
+    ITelegramBotClient botClient,
+    IUserAppTrackingService userAppTrackingService,
+    ITelegramNotificationService telegramNotificationService)
+    : BaseCallback(botClient, userAppTrackingService, telegramNotificationService)
 {
     public override string Name => TelegramCallbacks.ChosenAppCallback;
-
-    public ChosenAppCallback(
-        ITelegramBotClient botClient, 
-        IUserAppTrackingService userAppTrackingService,
-        ITelegramNotificationService telegramNotificationService) : base(botClient, userAppTrackingService, telegramNotificationService)
-    {
-    }
 
     public override async Task Execute(CallbackQuery callbackQuery, CancellationToken cancellationToken)
     {
