@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Quartz;
 using SteamTelegramBot.Core.Interfaces;
-using Telegram.Bot.Types;
 
 namespace SteamTelegramBot.Jobs.Jobs;
 

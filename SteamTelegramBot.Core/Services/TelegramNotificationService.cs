@@ -180,6 +180,7 @@ internal sealed class TelegramNotificationService(
     {
         text = text.ToTelegramMarkdownMessageText();
         await botClient.SendTextMessageAsync(chatId: chatId, text: text, parseMode: ParseMode.MarkdownV2, disableWebPagePreview: true);
+        logger.LogInformation("The notification was sent to a user with an ID {ChatId}", chatId);
     }
 
     private async Task MarkMessageAsSent(List<TelegramNotificationEntity> telegramNotifications)
