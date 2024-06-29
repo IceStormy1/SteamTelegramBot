@@ -53,17 +53,14 @@ builder.Services
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger(c => { c.SerializeAsV2 = true; })
-        .UseSwaggerUI(c =>
-        {
-            c.SwaggerEndpoint("/swagger/v1/swagger.json", $"{CommonConstants.ApiName} API V1");
-            c.RoutePrefix = string.Empty;
-            c.DocumentTitle = $"{CommonConstants.ApiName} Documentation";
-            c.DocExpansion(DocExpansion.None);
-        });
-}
+app.UseSwagger(c => { c.SerializeAsV2 = true; })
+    .UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", $"{CommonConstants.ApiName} API V1");
+        c.RoutePrefix = string.Empty;
+        c.DocumentTitle = $"{CommonConstants.ApiName} Documentation";
+        c.DocExpansion(DocExpansion.None);
+    });
 
 app
     .UseStatusCodePages()
