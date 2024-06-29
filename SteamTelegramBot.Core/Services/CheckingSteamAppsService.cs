@@ -8,7 +8,7 @@ namespace SteamTelegramBot.Core.Services;
 
 internal sealed class CheckingSteamAppsService(
     IMapper mapper,
-    ILogger<BaseService> logger,
+    ILogger<CheckingSteamAppsService> logger,
     ISteamService steamService,
     IServiceScopeFactory scopeServiceProvider,
     ITelegramNotificationService telegramNotificationService,
@@ -17,6 +17,7 @@ internal sealed class CheckingSteamAppsService(
 {
     private const string ServiceName = nameof(CheckingSteamAppsService);
     private const byte MaxUpdatedApplications = 60;
+
     private int _totalUpdated;
     private int _totalSuccessfulUpdatedApplications;
     private int _totalApplicationsNotFound;
