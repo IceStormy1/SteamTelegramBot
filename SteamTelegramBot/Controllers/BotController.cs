@@ -9,7 +9,7 @@ namespace SteamTelegramBot.Controllers;
 /// Telegram bot controller.
 /// </summary>
 [ApiController]
-[Route("[controller]")]
+[Route("api/v1/[controller]")]
 public class BotController : ControllerBase
 {
     private readonly ITelegramHandleService _telegramService;
