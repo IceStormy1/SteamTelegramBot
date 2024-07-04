@@ -98,13 +98,13 @@ internal sealed class CheckingSteamAppsService(
                 _totalSuccessfulUpdatedApplications,
                 _totalApplicationsNotFound);
 
-            // Steam Api throws error if spam requests, so delay in 5 seconds between batches of requests
-            await Task.Delay(TimeSpan.FromSeconds(5));
+            // Steam Api throws error if spam requests, so delay in 15 seconds between batches of requests
+            await Task.Delay(TimeSpan.FromSeconds(15));
         }
         catch (Exception e)
         {
             logger.LogError(e, "An error occurred while updating steam applications");
-            await Task.Delay(TimeSpan.FromMinutes(1));
+            await Task.Delay(TimeSpan.FromMinutes(30));
         }
     }
 
