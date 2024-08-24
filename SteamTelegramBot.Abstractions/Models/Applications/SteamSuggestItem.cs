@@ -10,7 +10,6 @@ namespace SteamTelegramBot.Abstractions.Models.Applications;
 /// </summary>
 public class SteamSuggestItem
 {
-    private const string CurrencySplitSymbol = "pуб.";
     private const string MatchNameTag = "\"><div class=\"match_name\"";
     private const string ItemKeyStartTag = "data-ds-itemkey=\"";
     private const string LinkStartTag = "href=\"";
@@ -116,7 +115,6 @@ public class SteamSuggestItem
 
     private static (PriceType PriceType, decimal? Price) GetPricing(string input)
     {
-        var test = input.Split("<div class=\"match_subtitle\">")[1].Split(LessThanSymbol)[0].ToLower();
         var priceCandidate = input.Split("<div class=\"match_subtitle\">")[1]
             .Split(LessThanSymbol)[0]
             .ToLower();
@@ -124,8 +122,8 @@ public class SteamSuggestItem
         var priceType = GetPriceType(priceCandidate);
         if (priceType is not PriceType.CostsMoney)
             return (PriceType: priceType, Price: null);
-
-        var priceString = priceCandidate.Split(separator: CurrencySplitSymbol)[0].Replace(',', '.');
+   
+        var priceString = priceCandidate.Split(separator: ' ')[0].Replace(',', '.');
         decimal? price = string.IsNullOrWhiteSpace(priceString)
             ? null
             : decimal.Parse(priceString, NumberStyles.Number, CultureInfo.InvariantCulture);
