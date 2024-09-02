@@ -10,7 +10,7 @@ public interface ISteamService
     /// <remarks>
     /// Steam does not support pagination, so the Steam API returns all applications
     /// </remarks>
-    Task<IReadOnlyCollection<AppItemDto>> GetAllSteamApps();
+    Task<IReadOnlyCollection<AppItemDto>> GetAllSteamApps(bool ascending = false);
 
     /// <summary>
     /// Returns basic info for steam application

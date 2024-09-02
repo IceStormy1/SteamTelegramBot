@@ -23,7 +23,7 @@ internal class CheckingSteamAppsJob(
     {
         logger.LogInformation("{ScheduleJob} - Start of the Steam applications update", JobName);
       
-        var allApplications = await steamService.GetAllSteamApps();
+        var allApplications = await steamService.GetAllSteamApps(ascending: false);
 
         logger.LogInformation("{ScheduleJob} - Total applications: {TotalApplications}", JobName, allApplications.Count);
 

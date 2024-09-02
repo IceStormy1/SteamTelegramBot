@@ -20,16 +20,20 @@ internal sealed class SteamService(
     private const string NameHtmlTag = "match_name";
     private const string PriceHtmlTag = "match_subtitle";
 
-    public async Task<IReadOnlyCollection<AppItemDto>> GetAllSteamApps()
+    public async Task<IReadOnlyCollection<AppItemDto>> GetAllSteamApps(bool ascending = false)
     {
         var allSteamApps = await steamWebApiClient.GetAllApps();
 
         if (!allSteamApps.IsSuccessStatusCode || allSteamApps.Content is null)
             throw new SteamException(allSteamApps.Error, "An error occurred while receiving all applications");
 
-        var orderedApplications = allSteamApps.Content.AppList.Apps
+        var notEmptyApplications = allSteamApps.Content.AppList.Apps
             .Where(x => !string.IsNullOrWhiteSpace(x.Name))
-            .OrderBy(x => x.AppId);
+            ;
+
+        var orderedApplications = ascending
+            ? notEmptyApplications.OrderBy(x => x.AppId)
+            : notEmptyApplications.OrderByDescending(x => x.AppId);
 
         return Mapper.Map<List<AppItemDto>>(orderedApplications);
     }

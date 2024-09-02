@@ -14,7 +14,7 @@ public sealed class PriceTrackingJob(ILogger<PriceTrackingJob> logger,
     public async Task Execute(IJobExecutionContext context)
     {
         logger.LogInformation("{ScheduleJob} - Start checking tracked applications", JobName);
-        var allApplications = await steamService.GetAllSteamApps();
+        var allApplications = await steamService.GetAllSteamApps(ascending: false);
 
         var updatedApplicationIds = await checkingSteamAppsService.UpdateTrackedApplications(allApplications);
 

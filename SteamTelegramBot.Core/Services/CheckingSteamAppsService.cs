@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Refit;
 using SteamTelegramBot.Abstractions.Models.Applications;
 using SteamTelegramBot.Core.Interfaces;
 
@@ -9,10 +10,9 @@ namespace SteamTelegramBot.Core.Services;
 internal sealed class CheckingSteamAppsService(
     IMapper mapper,
     ILogger<CheckingSteamAppsService> logger,
-    ISteamService steamService,
     IServiceScopeFactory scopeServiceProvider,
     ITelegramNotificationService telegramNotificationService,
-    IUserAppTrackingService userAppTrackingService) 
+    IUserAppTrackingService userAppTrackingService)
     : BaseService(mapper, logger), ICheckingSteamAppsService
 {
     private const string ServiceName = nameof(CheckingSteamAppsService);
@@ -22,6 +22,8 @@ internal sealed class CheckingSteamAppsService(
     private int _totalSuccessfulUpdatedApplications;
     private int _totalApplicationsNotFound;
     private int _totalApplications;
+
+    private ISteamService _steamService;
 
     /// <summary>
     /// Updates the tracked applications.
@@ -80,7 +82,7 @@ internal sealed class CheckingSteamAppsService(
     private async Task AddOrUpdateSteamApplications(IReadOnlyCollection<AppItemDto> updatedApplications)
     {
         await using var scope = scopeServiceProvider.CreateAsyncScope();
-        steamService = scope.ServiceProvider.GetRequiredService<ISteamService>();
+        _steamService = scope.ServiceProvider.GetRequiredService<ISteamService>();
 
         try
         {
@@ -101,9 +103,9 @@ internal sealed class CheckingSteamAppsService(
             // Steam Api throws error if spam requests, so delay in 15 seconds between batches of requests
             await Task.Delay(TimeSpan.FromSeconds(15));
         }
-        catch (Exception e)
+        catch (ApiException e)
         {
-            logger.LogError(e, "An error occurred while updating steam applications");
+            logger.LogError(e, "{Service} - An error occurred while updating steam applications. Content: {Content}", ServiceName, e.Content);
             await Task.Delay(TimeSpan.FromMinutes(30));
         }
     }
@@ -119,7 +121,7 @@ internal sealed class CheckingSteamAppsService(
         var updatedApplicationsIds = applications.Select(x => x.AppId).ToList();
         var foundedSteamApplications = CompareSuggestWithItems(steamSuggestResults, updatedApplicationsIds);
 
-        await steamService.AddOrUpdateSteamApplications(foundedSteamApplications);
+        await _steamService.AddOrUpdateSteamApplications(foundedSteamApplications);
 
         return foundedSteamApplications;
     }
@@ -130,7 +132,7 @@ internal sealed class CheckingSteamAppsService(
     private async Task<IReadOnlyCollection<SteamSuggestItem>[]> FindSteamApplications(
         IEnumerable<AppItemDto> applications)
     {
-        var steamSuggestTasks = applications.Select(x => steamService.GetSteamSuggests(x.Name));
+        var steamSuggestTasks = applications.Select(x => _steamService.GetSteamSuggests(x.Name));
         var steamSuggestResults = await Task.WhenAll(steamSuggestTasks);
 
         return steamSuggestResults;
