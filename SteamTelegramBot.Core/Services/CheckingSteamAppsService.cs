@@ -106,7 +106,7 @@ internal sealed class CheckingSteamAppsService(
         catch (ApiException e)
         {
             logger.LogError(e, "{Service} - An error occurred while updating steam applications. Content: {Content}", ServiceName, e.Content);
-            await Task.Delay(TimeSpan.FromMinutes(30));
+            throw;
         }
     }
 

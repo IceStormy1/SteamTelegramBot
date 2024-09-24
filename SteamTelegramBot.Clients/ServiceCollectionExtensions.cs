@@ -50,18 +50,18 @@ public static class ServiceCollectionExtensions
     {
         var retryTimeouts = Enumerable
             .Range(1, 3)
-            .Select(x => TimeSpan.FromMilliseconds(x * 500))
+            .Select(x => TimeSpan.FromMinutes(x * 30))
             .ToArray();
 
         var clientBuilder = services
             .AddHttpClient(HttpClientName, config => { config.BaseAddress = baseAddress; })
-            .AddTransientHttpErrorPolicy(p => p.Or<SocketException>().WaitAndRetryAsync(retryTimeouts));
+            .AddTransientHttpErrorPolicy(policy => policy.Or<ApiException>().WaitAndRetryAsync(retryTimeouts));
 
         clientConfigure?.Invoke(clientBuilder);
 
         services.AddRestClient<ISteamWebApiClient>();
         services.AddRestClient<IStoreSteamPoweredClient>();
-
+        
         return services;
     }
 
