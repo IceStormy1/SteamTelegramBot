@@ -11,6 +11,8 @@ using SteamTelegramBot.Data.Extensions;
 using SteamTelegramBot.Data.Helpers;
 using SteamTelegramBot.Extensions;
 using Swashbuckle.AspNetCore.SwaggerUI;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 using Telegram.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,6 +38,14 @@ builder.Services.AddControllers()
         cfg.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
         cfg.SerializerSettings.Converters.Add(new StringEnumConverter());
     });
+builder.Services.Configure<JsonSerializerOptions>(options =>
+{
+    options.MaxDepth = 64;
+    options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    options.WriteIndented = true;
+    options.PropertyNameCaseInsensitive = true;
+    options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+});
 
 var httpClientTimeoutSeconds = builder.Configuration.GetValue("HttpClientTimeout", defaultValue: 30);
 var httpClientTimeout = TimeSpan.FromSeconds(httpClientTimeoutSeconds);
@@ -44,10 +54,10 @@ builder.Services
     .AddEndpointsApiExplorer()
     .AddSwagger()
     .AddClients(
-        baseAddress: "http://localhost:7002", 
-        configuration:builder.Configuration,
+        baseAddress: "http://localhost:7002",
+        configuration: builder.Configuration,
         clientConfigure: b => b.ConfigureHttpClient(client => client.Timeout = httpClientTimeout)
-        )
+    )
     .AddCorsWithDefaultPolicy();
 
 var app = builder.Build();

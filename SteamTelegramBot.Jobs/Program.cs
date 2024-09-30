@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Quartz;
@@ -24,6 +26,15 @@ var host = Host.CreateDefaultBuilder(args)
         
         var httpClientTimeoutSeconds = context.Configuration.GetValue("HttpClientTimeout", defaultValue: 30);
         var httpClientTimeout = TimeSpan.FromSeconds(httpClientTimeoutSeconds);
+  
+        services.Configure<JsonSerializerOptions>(options =>
+        {
+            options.MaxDepth = 64;
+            options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            options.PropertyNameCaseInsensitive = true;
+            options.WriteIndented = true;
+            options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+        });
 
         services
             .AddOptions()

@@ -1,6 +1,8 @@
-﻿using System.Net.Sockets;
+﻿using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Polly;
 using Refit;
 using Telegram.Bot;
@@ -31,8 +33,9 @@ public static class ServiceCollectionExtensions
 
     {
         var botToken = configuration.GetSection("BotConfiguration:BotToken").Get<string>();
-
-        return services.AddClients(new Uri(baseAddress), clientConfigure)
+        
+        return services
+            .AddClients(new Uri(baseAddress), clientConfigure)
             .AddTelegramClient(botToken);
     }
 
@@ -48,6 +51,16 @@ public static class ServiceCollectionExtensions
         Action<IHttpClientBuilder> clientConfigure = null
         )
     {
+        services.ConfigureHttpClient(baseAddress, clientConfigure);
+
+        services.AddRestClient<ISteamWebApiClient>();
+        services.AddRestClient<IStoreSteamPoweredClient>();
+        
+        return services;
+    }
+
+    private static void ConfigureHttpClient(this IServiceCollection services, Uri baseAddress, Action<IHttpClientBuilder> clientConfigure = null)
+    {
         var retryTimeouts = Enumerable
             .Range(1, 3)
             .Select(x => TimeSpan.FromMinutes(x * 30))
@@ -55,14 +68,17 @@ public static class ServiceCollectionExtensions
 
         var clientBuilder = services
             .AddHttpClient(HttpClientName, config => { config.BaseAddress = baseAddress; })
-            .AddTransientHttpErrorPolicy(policy => policy.Or<ApiException>().WaitAndRetryAsync(retryTimeouts));
+            .SetHandlerLifetime(TimeSpan.FromMinutes(20))
+            .AddTransientHttpErrorPolicy(policy => policy.Or<ApiException>().WaitAndRetryAsync(retryTimeouts,
+                onRetry: (exception, timespan, retryAttempt, _) =>
+                {
+                    var logger = services.BuildServiceProvider().GetRequiredService<ILogger<IStoreSteamPoweredClient>>();
+                    if (exception != null)
+                        logger.LogError("Request failed with exception: {Message}", exception.Exception.Message);
+                    logger.LogWarning("Retrying in {delay} minutes. Attempt {retry}.", timespan.TotalMinutes, retryAttempt);
+                }));
 
         clientConfigure?.Invoke(clientBuilder);
-
-        services.AddRestClient<ISteamWebApiClient>();
-        services.AddRestClient<IStoreSteamPoweredClient>();
-        
-        return services;
     }
 
     private static void AddRestClient<T>(this IServiceCollection services) where T : class
@@ -81,7 +97,12 @@ public static class ServiceCollectionExtensions
                 httpClient.BaseAddress = new Uri("https://store.steampowered.com");
             }
 
-            var refitSettings = new RefitSettings(new NewtonsoftJsonContentSerializer());
+            var serializerOptions = p.GetRequiredService<IOptions<JsonSerializerOptions>>();
+
+            if (serializerOptions?.Value is null)
+                throw new ArgumentException("JsonSerializerOptions is empty", nameof(services));
+           
+            var refitSettings = new RefitSettings(new SystemTextJsonContentSerializer(serializerOptions.Value));
             var requestBuilder = RequestBuilder.ForType<T>(refitSettings);
 
             return RestService.For(httpClient, requestBuilder);
