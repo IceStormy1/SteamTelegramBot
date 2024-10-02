@@ -74,7 +74,7 @@ public static class ServiceCollectionExtensions
                 {
                     var logger = services.BuildServiceProvider().GetRequiredService<ILogger<IStoreSteamPoweredClient>>();
                     if (exception != null)
-                        logger.LogError("Request failed with exception: {Message}", exception.Exception.Message);
+                        logger.LogError("Request failed with exception: {Message}", exception.Exception?.Message);
                     logger.LogWarning("Retrying in {delay} minutes. Attempt {retry}.", timespan.TotalMinutes, retryAttempt);
                 }));
 
