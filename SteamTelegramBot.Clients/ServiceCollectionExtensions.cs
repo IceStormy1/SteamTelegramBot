@@ -68,7 +68,7 @@ public static class ServiceCollectionExtensions
 
         var clientBuilder = services
             .AddHttpClient(HttpClientName, config => { config.BaseAddress = baseAddress; })
-            .SetHandlerLifetime(TimeSpan.FromMinutes(20))
+            .SetHandlerLifetime(TimeSpan.FromMinutes(40))
             .AddTransientHttpErrorPolicy(policy => policy.Or<ApiException>().WaitAndRetryAsync(retryTimeouts,
                 onRetry: (exception, timespan, retryAttempt, _) =>
                 {
