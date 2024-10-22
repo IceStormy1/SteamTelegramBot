@@ -54,7 +54,7 @@ internal sealed class TelegramNotificationService(
             // Telegram doc: https://core.telegram.org/bots/faq#my-bot-is-hitting-limits-how-do-i-avoid-this
             await Task.Delay(TimeSpan.FromSeconds(TelegramMessageDelayInSeconds));
 
-            totalSentMessages += LimitOfSentMessages;
+            totalSentMessages += batchUnNotifiedUsers.Count;
         }
 
         var notifications = unNotifiedUsers.SelectMany(x => x.Value).ToList();

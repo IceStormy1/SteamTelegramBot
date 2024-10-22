@@ -1,9 +1,11 @@
-﻿namespace SteamTelegramBot.Data.Entities;
+﻿using SteamTelegramBot.Abstractions;
+
+namespace SteamTelegramBot.Data.Entities;
 
 /// <summary>
 /// Represents an entity for a Telegram notification.
 /// </summary>
-public sealed class TelegramNotificationEntity : BaseEntity
+public sealed class TelegramNotificationEntity : BaseEntity, IHasCreatedAt, IHasUpdatedAt
 {
     /// <summary>
     /// ID of the user application tracking associated with the notification
@@ -25,4 +27,10 @@ public sealed class TelegramNotificationEntity : BaseEntity
     /// Indicating whether the notification has been sent.
     /// </summary>
     public bool WasSent { get; set; }
+
+    /// <inheritdoc cref="IHasCreatedAt.CreatedAt"/>
+    public DateTime CreatedAt { get; set; }
+
+    /// <inheritdoc cref="IHasUpdatedAt.UpdatedAt"/>
+    public DateTime? UpdatedAt { get; set; }
 }
