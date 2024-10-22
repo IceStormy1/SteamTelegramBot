@@ -12,6 +12,7 @@ using SteamTelegramBot.Data.Entities;
 using SteamTelegramBot.Data.Extensions;
 using SteamTelegramBot.Data.Interfaces;
 using Telegram.Bot;
+using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -179,8 +180,16 @@ internal sealed class TelegramNotificationService(
     private async Task SendTelegramMessage(long chatId, string text)
     {
         text = text.ToTelegramMarkdownMessageText();
-        await botClient.SendTextMessageAsync(chatId: chatId, text: text, parseMode: ParseMode.MarkdownV2, disableWebPagePreview: true);
-        logger.LogInformation("The notification was sent to a user with an ID {ChatId}", chatId);
+        try
+        {
+            await botClient.SendTextMessageAsync(chatId: chatId, text: text, parseMode: ParseMode.MarkdownV2,
+                disableWebPagePreview: true);
+            logger.LogInformation("The notification was sent to a user with an ID {ChatId}", chatId);
+        }
+        catch (ApiRequestException e)
+        {
+            logger.LogError(e, message: "An error occurred while sending a telegram message with an ID {ChatId}", chatId);
+        }
     }
 
     private async Task MarkMessageAsSent(List<TelegramNotificationEntity> telegramNotifications)
